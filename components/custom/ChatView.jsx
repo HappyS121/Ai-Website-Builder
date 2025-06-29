@@ -1,6 +1,6 @@
 "use client"
 import { MessagesContext } from '@/context/MessagesContext';
-import { ArrowRight, Link, Loader2Icon, Send, Bot, User, Sparkles } from 'lucide-react';
+import { ArrowRight, Link, Loader2Icon, Send } from 'lucide-react';
 import { api } from '@/convex/_generated/api';
 import { useConvex } from 'convex/react';
 import { useParams } from 'next/navigation';
@@ -83,145 +83,80 @@ function ChatView() {
     }
 
     return (
-        <div className="relative h-full flex flex-col bg-gradient-to-br from-slate-900 to-slate-800">
-            {/* Minimalist Environment Header */}
-            <div className="bg-slate-800/30 border-b border-slate-700/30 backdrop-blur-xl px-4 py-3">
-                <div className="flex items-center justify-between">
-                    <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border ${
+        <div className="relative h-[85vh] flex flex-col bg-gray-900">
+            {/* Environment Indicator */}
+            <div className="bg-gray-800/50 border-b border-gray-700 px-4 py-2">
+                <div className="flex items-center gap-2">
+                    <div className={`px-3 py-1 rounded-full text-xs font-medium ${
                         environment === 'react' 
-                            ? 'bg-blue-500/10 text-blue-400 border-blue-500/30' 
-                            : 'bg-orange-500/10 text-orange-400 border-orange-500/30'
+                            ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' 
+                            : 'bg-orange-500/20 text-orange-400 border border-orange-500/30'
                     }`}>
-                        <div className="w-1.5 h-1.5 rounded-full bg-current animate-pulse"></div>
-                        <span>{environment === 'react' ? 'React' : 'HTML'}</span>
-                    </div>
-                    
-                    <div className="flex items-center gap-1.5 text-slate-400 text-xs">
-                        <Sparkles className="h-3 w-3" />
-                        <span className="hidden sm:inline">AI Active</span>
+                        {environment === 'react' ? 'React Environment' : 'HTML Environment'}
                     </div>
                 </div>
             </div>
 
-            {/* Chat Messages - Optimized for all resolutions */}
-            <div className="flex-1 overflow-y-auto custom-scrollbar p-3 sm:p-4 lg:p-6">
-                <div className="max-w-full space-y-4 sm:space-y-6">
+            {/* Chat Messages */}
+            <div className="flex-1 overflow-y-auto scrollbar-hide p-4">
+                <div className="max-w-4xl mx-auto space-y-4">
                     {Array.isArray(messages) && messages?.map((msg, index) => (
                         <div
                             key={index}
-                            className={`flex gap-2 sm:gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                            className={`p-4 rounded-lg ${
+                                msg.role === 'user' 
+                                    ? 'bg-gray-800/50 border border-gray-700' 
+                                    : 'bg-gray-800/30 border border-gray-700'
+                            }`}
                         >
-                            {/* AI Avatar */}
-                            {msg.role === 'ai' && (
-                                <div className="flex-shrink-0">
-                                    <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
-                                        <Bot className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
-                                    </div>
-                                </div>
-                            )}
-                            
-                            {/* Message Content */}
-                            <div className={`max-w-[85%] sm:max-w-[80%] lg:max-w-3xl ${msg.role === 'user' ? 'order-first' : ''}`}>
-                                <div className={`p-3 sm:p-4 lg:p-5 rounded-xl sm:rounded-2xl shadow-lg ${
+                            <div className="flex items-start gap-3">
+                                <div className={`p-2 rounded-lg ${
                                     msg.role === 'user' 
-                                        ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white' 
-                                        : 'glass-morphism text-slate-100'
+                                        ? 'bg-blue-500/20 text-blue-400' 
+                                        : 'bg-purple-500/20 text-purple-400'
                                 }`}>
-                                    {msg.role === 'ai' ? (
-                                        <ReactMarkdown className="prose prose-invert max-w-none prose-sm sm:prose-base prose-pre:bg-slate-800 prose-pre:border prose-pre:border-slate-600 prose-pre:text-xs sm:prose-pre:text-sm">
-                                            {msg.content}
-                                        </ReactMarkdown>
-                                    ) : (
-                                        <p className="text-white text-sm sm:text-base">{msg.content}</p>
-                                    )}
+                                    {msg.role === 'user' ? 'You' : 'AI'}
                                 </div>
-                                
-                                {/* Minimalist Timestamp */}
-                                <div className={`text-xs text-slate-500 mt-1 ${
-                                    msg.role === 'user' ? 'text-right' : 'text-left'
-                                }`}>
-                                    {msg.role === 'user' ? 'You' : 'AI'} • now
-                                </div>
+                                <ReactMarkdown className="prose prose-invert flex-1 overflow-auto">
+                                    {msg.content}
+                                </ReactMarkdown>
                             </div>
-                            
-                            {/* User Avatar */}
-                            {msg.role === 'user' && (
-                                <div className="flex-shrink-0">
-                                    <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-r from-slate-600 to-slate-700 rounded-lg flex items-center justify-center">
-                                        <User className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
-                                    </div>
-                                </div>
-                            )}
                         </div>
                     ))}
                     
-                    {/* Loading Message */}
                     {loading && (
-                        <div className="flex gap-2 sm:gap-3 justify-start">
-                            <div className="flex-shrink-0">
-                                <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
-                                    <Bot className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
-                                </div>
-                            </div>
-                            <div className="glass-morphism p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg">
-                                <div className="flex items-center gap-2 text-slate-300">
-                                    <Loader2Icon className="animate-spin h-4 w-4 text-blue-400" />
-                                    <div className="flex gap-1">
-                                        <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce"></div>
-                                        <div className="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                                        <div className="w-1.5 h-1.5 bg-teal-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-                                    </div>
-                                    <span className="text-sm font-medium">Thinking...</span>
-                                </div>
+                        <div className="p-4 rounded-lg bg-gray-800/30 border border-gray-700">
+                            <div className="flex items-center gap-3 text-gray-400">
+                                <Loader2Icon className="animate-spin h-5 w-5" />
+                                <p className="font-medium">Generating response...</p>
                             </div>
                         </div>
                     )}
                 </div>
             </div>
 
-            {/* Minimalist Input Section */}
-            <div className="border-t border-slate-700/30 bg-slate-800/20 backdrop-blur-xl p-3 sm:p-4">
-                <div className="relative group">
-                    {/* Subtle Glow Effect */}
-                    <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-xl blur opacity-0 group-hover:opacity-100 transition duration-300"></div>
-                    
-                    {/* Input Container */}
-                    <div className="relative glass-morphism rounded-xl p-3">
-                        <div className="flex gap-2 sm:gap-3">
+            {/* Input Section */}
+            <div className="border-t border-gray-800 bg-gray-900/50 backdrop-blur-sm p-4">
+                <div className="max-w-4xl mx-auto">
+                    <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-4">
+                        <div className="flex gap-3">
                             <textarea
-                                placeholder={`Ask about your ${environment} project...`}
+                                placeholder={`Type your ${environment} question here...`}
                                 value={userInput}
                                 onChange={(event) => setUserInput(event.target.value)}
-                                className="flex-1 bg-slate-800/30 border border-slate-600/30 rounded-lg p-2 sm:p-3 text-white placeholder-slate-400 focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 outline-none transition-all duration-300 resize-none text-sm sm:text-base"
-                                rows="2"
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter' && !e.shiftKey) {
-                                        e.preventDefault();
-                                        if (userInput?.trim()) {
-                                            onGenerate(userInput);
-                                        }
-                                    }
-                                }}
+                                className="w-full bg-gray-900/50 border border-gray-700 rounded-xl p-4 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-200 resize-none h-32"
                             />
-                            
-                            {/* Send Button */}
                             {userInput && (
                                 <button
                                     onClick={() => onGenerate(userInput)}
-                                    className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white p-2 sm:p-3 rounded-lg transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg"
+                                    className="flex items-center justify-center bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 rounded-xl px-4 transition-all duration-200"
                                 >
-                                    <Send className="h-4 w-4 sm:h-5 sm:w-5" />
+                                    <Send className="h-6 w-6 text-white" />
                                 </button>
                             )}
                         </div>
-                        
-                        {/* Footer */}
-                        <div className="flex justify-between items-center mt-2 text-xs text-slate-500">
-                            <span className="hidden sm:inline">Enter to send • Shift+Enter for new line</span>
-                            <div className="flex items-center gap-1">
-                                <Link className="h-3 w-3" />
-                                <span>AI Powered</span>
-                            </div>
+                        <div className="flex justify-end mt-3">
+                            <Link className="h-5 w-5 text-gray-400 hover:text-gray-300 transition-colors duration-200" />
                         </div>
                     </div>
                 </div>

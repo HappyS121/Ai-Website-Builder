@@ -1,8 +1,8 @@
 "use client"
 import Lookup from '@/data/Lookup';
 import { MessagesContext } from '@/context/MessagesContext';
-import { ArrowRight, Link, Sparkles, Send, Wand2, Loader2, Code, Globe, Zap, Star } from 'lucide-react';
-import React, { useContext, useState, useEffect } from 'react';
+import { ArrowRight, Link, Sparkles, Send, Wand2, Loader2, Code, Globe } from 'lucide-react';
+import React, { useContext, useState } from 'react';
 import { useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { useRouter } from 'next/navigation';
@@ -11,45 +11,24 @@ function Hero() {
     const [userInput, setUserInput] = useState('');
     const [isEnhancing, setIsEnhancing] = useState(false);
     const [selectedEnvironment, setSelectedEnvironment] = useState('react');
-    const [particles, setParticles] = useState([]);
     const { messages, setMessages } = useContext(MessagesContext);
     const CreateWorkspace = useMutation(api.workspace.CreateWorkspace);
     const router = useRouter();
-
-    // Generate floating particles
-    useEffect(() => {
-        const generateParticles = () => {
-            const newParticles = [];
-            for (let i = 0; i < 50; i++) {
-                newParticles.push({
-                    id: i,
-                    x: Math.random() * 100,
-                    y: Math.random() * 100,
-                    delay: Math.random() * 6,
-                    duration: 3 + Math.random() * 4
-                });
-            }
-            setParticles(newParticles);
-        };
-        generateParticles();
-    }, []);
 
     const environments = [
         {
             id: 'react',
             name: 'React',
             icon: Code,
-            description: 'Modern React with Vite & TypeScript',
-            color: 'from-blue-500 via-blue-600 to-cyan-500',
-            features: ['Components', 'Hooks', 'State Management', 'Routing']
+            description: 'Modern React with Vite',
+            color: 'from-blue-500 to-cyan-500'
         },
         {
             id: 'html',
             name: 'HTML',
             icon: Globe,
-            description: 'Pure HTML/CSS/JavaScript',
-            color: 'from-orange-500 via-red-500 to-pink-500',
-            features: ['Semantic HTML', 'Modern CSS', 'Vanilla JS', 'Responsive']
+            description: 'Pure HTML/CSS/JS',
+            color: 'from-orange-500 to-red-500'
         }
     ];
 
@@ -105,197 +84,131 @@ function Hero() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
-            {/* Animated Background */}
-            <div className="absolute inset-0">
-                {/* Grid Pattern */}
-                <div className="absolute inset-0 grid-pattern opacity-20"></div>
-                
-                {/* Gradient Orbs */}
-                <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
-                <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
-                
-                {/* Floating Particles */}
-                <div className="particles">
-                    {particles.map((particle) => (
-                        <div
-                            key={particle.id}
-                            className="particle"
-                            style={{
-                                left: `${particle.x}%`,
-                                top: `${particle.y}%`,
-                                animationDelay: `${particle.delay}s`,
-                                animationDuration: `${particle.duration}s`
-                            }}
-                        />
-                    ))}
-                </div>
+        <div className="min-h-screen bg-gray-950 relative overflow-hidden">
+            {/* Animated background elements */}
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px]">
+                <div className="absolute left-1/2 top-0 h-[500px] w-[1000px] -translate-x-1/2 bg-[radial-gradient(circle_400px_at_50%_300px,#3b82f625,transparent)]" />
             </div>
 
-            <div className="container mx-auto px-6 py-20 relative z-10">
-                <div className="flex flex-col items-center justify-center space-y-16">
-                    {/* Environment Selector */}
-                    <div className="w-full max-w-4xl">
-                        <div className="text-center mb-8">
-                            <h3 className="text-2xl font-bold text-white mb-3">Choose Your Stack</h3>
-                            <p className="text-slate-400">Select the perfect technology for your vision</p>
+            <div className="container mx-auto px-4 py-16 relative z-10">
+                <div className="flex flex-col items-center justify-center space-y-12">
+                    {/* Hero Header */}
+                    <div className="text-center space-y-6">
+                        <div className="inline-flex items-center justify-center space-x-2 bg-electric-blue-500/20 rounded-full px-6 py-3 mb-6 border border-electric-blue-500/30">
+                            <Sparkles className="h-6 w-6 text-electric-blue-400" />
+                            <span className="text-electric-blue-400 text-lg font-semibold tracking-wide">
+                                NEXT-GEN AI DEVELOPMENT
+                            </span>
                         </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <h1 className="text-6xl md:text-7xl font-bold text-transparent bg-clip-text bg-[linear-gradient(45deg,#60a5fa_30%,#ec4899)] leading-tight">
+                            Code the <br className="md:hidden" />Impossible
+                        </h1>
+                        <p className="text-xl text-neon-cyan max-w-3xl mx-auto font-mono tracking-tight">
+                            Transform your wildest ideas into production-ready code with AI-powered assistance
+                        </p>
+                    </div>
+
+                    {/* Environment Selector */}
+                    <div className="w-full max-w-2xl">
+                        <div className="text-center mb-6">
+                            <h3 className="text-xl font-semibold text-white mb-2">Choose Your Development Environment</h3>
+                            <p className="text-gray-400">Select the technology stack for your project</p>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {environments.map((env) => {
                                 const IconComponent = env.icon;
-                                const isSelected = selectedEnvironment === env.id;
-                                
                                 return (
-                                    <div
+                                    <button
                                         key={env.id}
                                         onClick={() => setSelectedEnvironment(env.id)}
-                                        className={`group relative cursor-pointer transition-all duration-500 hover-lift ${
-                                            isSelected ? 'scale-105' : 'hover:scale-102'
+                                        className={`group relative p-6 rounded-xl border-2 transition-all duration-300 ${
+                                            selectedEnvironment === env.id
+                                                ? 'border-electric-blue-500 bg-electric-blue-500/10 shadow-[0_0_20px_2px_rgba(59,130,246,0.3)]'
+                                                : 'border-gray-700 bg-gray-900/50 hover:border-gray-600 hover:bg-gray-800/50'
                                         }`}
                                     >
-                                        {/* Glow Effect */}
-                                        {isSelected && (
-                                            <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl blur opacity-30 animate-pulse-glow"></div>
-                                        )}
-                                        
-                                        {/* Card */}
-                                        <div className={`relative card-modern p-8 ${
-                                            isSelected 
-                                                ? 'border-blue-500/50 bg-slate-800/70' 
-                                                : 'hover:border-slate-600/50'
-                                        }`}>
-                                            {/* Header */}
-                                            <div className="flex items-center justify-between mb-6">
-                                                <div className="flex items-center space-x-4">
-                                                    <div className={`p-4 rounded-2xl bg-gradient-to-r ${env.color} shadow-lg`}>
-                                                        <IconComponent className="h-8 w-8 text-white" />
-                                                    </div>
-                                                    <div>
-                                                        <h4 className="text-2xl font-bold text-white">{env.name}</h4>
-                                                        <p className="text-slate-400">{env.description}</p>
-                                                    </div>
-                                                </div>
-                                                
-                                                {/* Selection Indicator */}
-                                                <div className={`w-6 h-6 rounded-full border-2 transition-all duration-300 ${
-                                                    isSelected 
-                                                        ? 'border-blue-500 bg-blue-500' 
-                                                        : 'border-slate-600 group-hover:border-slate-500'
-                                                }`}>
-                                                    {isSelected && (
-                                                        <div className="w-full h-full rounded-full bg-white scale-50"></div>
-                                                    )}
-                                                </div>
+                                        <div className="flex items-center space-x-4">
+                                            <div className={`p-3 rounded-lg bg-gradient-to-r ${env.color}`}>
+                                                <IconComponent className="h-8 w-8 text-white" />
                                             </div>
-
-                                            {/* Features */}
-                                            <div className="grid grid-cols-2 gap-3">
-                                                {env.features.map((feature, index) => (
-                                                    <div key={index} className="flex items-center space-x-2">
-                                                        <div className="w-2 h-2 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full"></div>
-                                                        <span className="text-sm text-slate-300">{feature}</span>
-                                                    </div>
-                                                ))}
+                                            <div className="text-left">
+                                                <h4 className="text-lg font-semibold text-white">{env.name}</h4>
+                                                <p className="text-sm text-gray-400">{env.description}</p>
                                             </div>
-
-                                            {/* Shimmer Effect */}
-                                            <div className="shimmer-effect absolute inset-0 rounded-2xl"></div>
                                         </div>
-                                    </div>
+                                        {selectedEnvironment === env.id && (
+                                            <div className="absolute top-2 right-2">
+                                                <div className="w-3 h-3 bg-electric-blue-500 rounded-full animate-pulse" />
+                                            </div>
+                                        )}
+                                    </button>
                                 );
                             })}
                         </div>
                     </div>
 
-                    {/* Input Section */}
-                    <div className="w-full max-w-4xl">
-                        <div className="relative group">
-                            {/* Glow Effect */}
-                            <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-300"></div>
-                            
-                            {/* Main Container */}
-                            <div className="relative glass-morphism rounded-2xl p-8">
-                                <div className="flex flex-col lg:flex-row gap-6">
-                                    {/* Text Area */}
-                                    <div className="flex-1">
-                                        <textarea
-                                            placeholder={`Describe your ${selectedEnvironment.toUpperCase()} project vision...`}
-                                            value={userInput}
-                                            onChange={(e) => setUserInput(e.target.value)}
-                                            className="w-full h-40 bg-slate-800/50 border-2 border-slate-600/50 rounded-xl p-6 text-white placeholder-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none font-mono text-lg resize-none transition-all duration-300 backdrop-blur-sm"
-                                            disabled={isEnhancing}
-                                        />
-                                    </div>
-                                    
-                                    {/* Action Buttons */}
-                                    <div className="flex lg:flex-col gap-4">
+                    {/* Modified Input Section */}
+                    <div className="w-full max-w-3xl bg-gray-900/40 backdrop-blur-2xl rounded-xl border-2 border-electric-blue-500/40 shadow-[0_0_40px_5px_rgba(59,130,246,0.15)]">
+                        <div className="p-2 bg-gradient-to-r from-electric-blue-500/10 to-purple-500/10">
+                            <div className="bg-gray-900/80 p-6 rounded-lg">
+                                <div className="flex gap-4">
+                                    <textarea
+                                        placeholder={`DESCRIBE YOUR ${selectedEnvironment.toUpperCase()} PROJECT...`}
+                                        value={userInput}
+                                        onChange={(e) => setUserInput(e.target.value)}
+                                        className="w-full bg-transparent border-2 border-electric-blue-500/30 rounded-lg p-5 text-gray-100 placeholder-electric-blue-500/60 focus:border-electric-blue-500 focus:ring-0 outline-none font-mono text-lg h-40 resize-none transition-all duration-300 hover:border-electric-blue-500/60"
+                                        disabled={isEnhancing}
+                                    />
+                                    <div className="flex flex-col gap-2">
                                         {userInput && (
                                             <>
                                                 <button
                                                     onClick={enhancePrompt}
                                                     disabled={isEnhancing}
-                                                    className="btn-secondary flex items-center justify-center min-w-[120px] h-16 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    className={`flex items-center justify-center bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 rounded-xl px-4 py-4 transition-all duration-200 ${isEnhancing ? 'opacity-70 cursor-not-allowed' : ''}`}
                                                 >
                                                     {isEnhancing ? (
-                                                        <Loader2 className="h-6 w-6 animate-spin" />
+                                                        <Loader2 className="h-8 w-8 animate-spin" />
                                                     ) : (
-                                                        <>
-                                                            <Wand2 className="h-6 w-6 mr-2" />
-                                                            <span className="hidden sm:inline">Enhance</span>
-                                                        </>
+                                                        <Wand2 className="h-8 w-8" />
                                                     )}
                                                 </button>
                                                 <button
                                                     onClick={() => onGenerate(userInput)}
                                                     disabled={isEnhancing}
-                                                    className="btn-primary flex items-center justify-center min-w-[120px] h-16 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    className={`flex items-center justify-center bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 rounded-xl px-4 py-4 transition-all duration-200 ${isEnhancing ? 'opacity-70 cursor-not-allowed' : ''}`}
                                                 >
-                                                    <Send className="h-6 w-6 mr-2" />
-                                                    <span className="hidden sm:inline">Generate</span>
+                                                    <Send className="h-8 w-8" />
                                                 </button>
                                             </>
                                         )}
                                     </div>
                                 </div>
+                                <div className="flex justify-end mt-4">
+                                    <Link className="h-6 w-6 text-electric-blue-400/80 hover:text-electric-blue-400 transition-colors duration-200" />
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    {/* Suggestions Grid */}
-                    <div className="w-full max-w-6xl">
-                        <div className="text-center mb-8">
-                            <h3 className="text-2xl font-bold text-white mb-3">
-                                {selectedEnvironment === 'react' ? 'React Inspirations' : 'HTML Templates'}
+                    {/* Environment-specific Suggestions Grid */}
+                    <div className="w-full max-w-5xl">
+                        <div className="text-center mb-6">
+                            <h3 className="text-lg font-semibold text-white">
+                                {selectedEnvironment === 'react' ? 'React Project Ideas' : 'HTML Project Ideas'}
                             </h3>
-                            <p className="text-slate-400">Click any idea to get started instantly</p>
                         </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {getSuggestionsForEnvironment().map((suggestion, index) => (
                                 <button
                                     key={index}
                                     onClick={() => onSuggestionClick(suggestion)}
-                                    className="group relative p-6 card-modern text-left hover-lift"
+                                    className="group relative p-6 bg-gray-900/50 hover:bg-gray-800/60 border-2 border-electric-blue-500/20 rounded-xl text-left transition-all duration-300 hover:border-electric-blue-500/40 hover:shadow-[0_0_20px_2px_rgba(59,130,246,0.2)]"
                                 >
-                                    {/* Icon */}
-                                    <div className="flex items-center justify-between mb-4">
-                                        <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
-                                            <Code className="h-5 w-5 text-white" />
-                                        </div>
-                                        <ArrowRight className="h-5 w-5 text-slate-400 group-hover:text-blue-400 transition-colors duration-200" />
-                                    </div>
-                                    
-                                    {/* Content */}
-                                    <h4 className="text-white font-semibold mb-2 group-hover:text-blue-400 transition-colors duration-200">
+                                    <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_50%,#3b82f620)] opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg" />
+                                    <span className="text-electric-blue-400/80 group-hover:text-electric-blue-400 font-mono text-sm tracking-wide transition-colors duration-300">
                                         {suggestion}
-                                    </h4>
-                                    <p className="text-slate-400 text-sm">
-                                        Ready-to-use {selectedEnvironment} template
-                                    </p>
-
-                                    {/* Shimmer Effect */}
-                                    <div className="shimmer-effect absolute inset-0 rounded-2xl"></div>
+                                    </span>
                                 </button>
                             ))}
                         </div>
