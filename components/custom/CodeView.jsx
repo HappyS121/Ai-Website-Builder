@@ -18,7 +18,7 @@ import { UpdateFiles } from '@/convex/workspace';
 import { useConvex, useMutation } from 'convex/react';
 import { useParams } from 'next/navigation';
 import { api } from '@/convex/_generated/api';
-import { Loader2Icon, Download } from 'lucide-react';
+import { Loader2Icon, Download, Code, Eye, FolderOpen, Zap } from 'lucide-react';
 import JSZip from 'jszip';
 
 function CodeView() {
@@ -190,86 +190,189 @@ function CodeView() {
         return environment === 'html' ? {} : Lookup.DEPENDANCY.REACT;
     };
 
-    return (
-        <div className='relative'>
-            <div className='bg-[#181818] w-full p-2 border'>
-                <div className='flex items-center justify-between'>
-                    <div className='flex items-center gap-4'>
-                        <div className='flex items-center flex-wrap shrink-0 bg-black p-1 justify-center
-                        w-[140px] gap-3 rounded-full'>
-                            <h2 onClick={() => setActiveTab('code')}
-                                className={`text-sm cursor-pointer 
-                            ${activeTab == 'code' && 'text-blue-500 bg-blue-500 bg-opacity-25 p-1 px-2 rounded-full'}`}>
-                                Code</h2>
+    const tabs = [
+        { id: 'code', name: 'Code', icon: Code },
+        { id: 'preview', name: 'Preview', icon: Eye }
+    ];
 
-                            <h2 onClick={() => setActiveTab('preview')}
-                                className={`text-sm cursor-pointer 
-                            ${activeTab == 'preview' && 'text-blue-500 bg-blue-500 bg-opacity-25 p-1 px-2 rounded-full'}`}>
-                                Preview</h2>
+    return (
+        <div className='relative bg-gradient-to-br from-slate-900 to-slate-800'>
+            {/* Header */}
+            <div className='bg-slate-800/50 border-b border-slate-700/50 backdrop-blur-xl p-4'>
+                <div className='flex items-center justify-between'>
+                    <div className='flex items-center gap-6'>
+                        {/* Tab Selector */}
+                        <div className='flex items-center bg-slate-900/50 p-1 rounded-xl border border-slate-700/50'>
+                            {tabs.map((tab) => {
+                                const IconComponent = tab.icon;
+                                return (
+                                    <button
+                                        key={tab.id}
+                                        onClick={() => setActiveTab(tab.id)}
+                                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                                            activeTab === tab.id
+                                                ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg'
+                                                : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                                        }`}
+                                    >
+                                        <IconComponent className="h-4 w-4" />
+                                        {tab.name}
+                                    </button>
+                                );
+                            })}
                         </div>
                         
-                        {/* Environment Indicator */}
-                        <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        {/* Environment Badge */}
+                        <div className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-medium ${
                             environment === 'react' 
-                                ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' 
-                                : 'bg-orange-500/20 text-orange-400 border border-orange-500/30'
+                                ? 'bg-blue-500/10 text-blue-400 border-blue-500/30' 
+                                : 'bg-orange-500/10 text-orange-400 border-orange-500/30'
                         }`}>
-                            {environment === 'react' ? 'React' : 'HTML/CSS/JS'}
+                            <div className="w-2 h-2 rounded-full bg-current animate-pulse"></div>
+                            {environment === 'react' ? 'React Environment' : 'HTML/CSS/JS Environment'}
+                        </div>
+
+                        {/* File Count */}
+                        <div className="flex items-center gap-2 text-slate-400 text-sm">
+                            <FolderOpen className="h-4 w-4" />
+                            <span>{Object.keys(files).length} files</span>
                         </div>
                     </div>
                     
-                    {/* Download Button */}
-                    <button
-                        onClick={downloadFiles}
-                        className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full transition-colors duration-200"
-                    >
-                        <Download className="h-4 w-4" />
-                        <span>Download Files</span>
-                    </button>
+                    {/* Actions */}
+                    <div className="flex items-center gap-3">
+                        {/* Status */}
+                        <div className="flex items-center gap-2 text-emerald-400 text-sm">
+                            <Zap className="h-4 w-4" />
+                            <span>Live Preview</span>
+                        </div>
+                        
+                        {/* Download Button */}
+                        <button
+                            onClick={downloadFiles}
+                            className="btn-primary flex items-center gap-2 px-4 py-2 text-sm"
+                        >
+                            <Download className="h-4 w-4" />
+                            <span>Export Project</span>
+                        </button>
+                    </div>
                 </div>
             </div>
+
+            {/* Code Editor */}
             <SandpackProvider 
-            files={files}
-            template={getSandpackTemplate()}
-            theme={'dark'}
-            customSetup={{
-                dependencies: getDependencies(),
-                entry: environment === 'html' ? '/index.html' : '/index.js'
-            }}
-            options={{
-                bundlerTimeoutSecs: 120,
-                recompileMode: "immediate",
-                recompileDelay: 300
-            }}
+                files={files}
+                template={getSandpackTemplate()}
+                theme={{
+                    colors: {
+                        surface1: '#1e293b',
+                        surface2: '#334155',
+                        surface3: '#475569',
+                        disabled: '#64748b',
+                        base: '#f8fafc',
+                        clickable: '#e2e8f0',
+                        hover: '#cbd5e1',
+                        accent: '#3b82f6',
+                        error: '#ef4444',
+                        errorSurface: '#fecaca',
+                        warning: '#f59e0b',
+                        warningSurface: '#fed7aa'
+                    },
+                    syntax: {
+                        plain: '#f8fafc',
+                        comment: '#64748b',
+                        keyword: '#3b82f6',
+                        tag: '#06d6a0',
+                        punctuation: '#cbd5e1',
+                        definition: '#f59e0b',
+                        property: '#06d6a0',
+                        static: '#ef4444',
+                        string: '#10b981'
+                    },
+                    font: {
+                        body: 'Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif',
+                        mono: 'JetBrains Mono, Fira Code, Monaco, Consolas, monospace',
+                        size: '14px',
+                        lineHeight: '1.6'
+                    }
+                }}
+                customSetup={{
+                    dependencies: getDependencies(),
+                    entry: environment === 'html' ? '/index.html' : '/index.js'
+                }}
+                options={{
+                    bundlerTimeoutSecs: 120,
+                    recompileMode: "immediate",
+                    recompileDelay: 300,
+                    showNavigator: true,
+                    showTabs: true,
+                    showLineNumbers: true,
+                    showInlineErrors: true,
+                    wrapContent: true,
+                    editorHeight: '80vh'
+                }}
             >
                 <div className="relative">
                     <SandpackLayout>
-                        {activeTab=='code'?<>
-                            <SandpackFileExplorer style={{ height: '80vh' }} />
-                            <SandpackCodeEditor 
-                            style={{ height: '80vh' }}
-                            showTabs
-                            showLineNumbers
-                            showInlineErrors
-                            wrapContent />
-                        </>:
-                        <>
+                        {activeTab === 'code' ? (
+                            <>
+                                <SandpackFileExplorer 
+                                    style={{ 
+                                        height: '80vh',
+                                        backgroundColor: '#1e293b',
+                                        borderRight: '1px solid #334155'
+                                    }} 
+                                />
+                                <SandpackCodeEditor 
+                                    style={{ 
+                                        height: '80vh',
+                                        backgroundColor: '#1e293b'
+                                    }}
+                                    showTabs
+                                    showLineNumbers
+                                    showInlineErrors
+                                    wrapContent 
+                                />
+                            </>
+                        ) : (
                             <SandpackPreview 
-                                style={{ height: '80vh' }} 
+                                style={{ 
+                                    height: '80vh',
+                                    backgroundColor: '#1e293b'
+                                }} 
                                 showNavigator={true}
                                 showOpenInCodeSandbox={false}
                                 showRefreshButton={true}
                             />
-                        </>}
+                        )}
                     </SandpackLayout>
                 </div>
             </SandpackProvider>
 
-            {loading&&<div className='p-10 bg-gray-900 opacity-80 absolute top-0 
-            rounded-lg w-full h-full flex items-center justify-center'>
-                <Loader2Icon className='animate-spin h-10 w-10 text-white'/>
-                <h2 className='text-white'> Generating {environment} files...</h2>
-            </div>}
+            {/* Loading Overlay */}
+            {loading && (
+                <div className='absolute inset-0 bg-slate-900/90 backdrop-blur-sm flex items-center justify-center z-50'>
+                    <div className="glass-morphism p-8 rounded-2xl text-center">
+                        <div className="flex items-center justify-center mb-4">
+                            <div className="relative">
+                                <Loader2Icon className='animate-spin h-12 w-12 text-blue-400'/>
+                                <div className="absolute inset-0 h-12 w-12 border-2 border-cyan-400/30 rounded-full animate-pulse"></div>
+                            </div>
+                        </div>
+                        <h3 className='text-white text-xl font-semibold mb-2'>
+                            Generating {environment} Project
+                        </h3>
+                        <p className="text-slate-400">
+                            AI is crafting your code...
+                        </p>
+                        <div className="flex justify-center gap-1 mt-4">
+                            <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div>
+                            <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                            <div className="w-2 h-2 bg-teal-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
