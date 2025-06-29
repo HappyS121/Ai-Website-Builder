@@ -2,6 +2,19 @@ import { NextResponse } from "next/server";
 import { GenAiCode, openRouterCodeSessions } from '@/configs/AiModel';
 import Prompt from '@/data/Prompt';
 
+function sanitizeJsonString(jsonString) {
+    // Fix common JSON escaping issues
+    return jsonString
+        // Fix unescaped backslashes (but preserve already properly escaped ones)
+        .replace(/\\(?!["\\/bfnrt]|u[0-9a-fA-F]{4})/g, '\\\\')
+        // Fix unescaped quotes within strings
+        .replace(/(?<!\\)"/g, '\\"')
+        // Fix the quotes we just over-escaped at the beginning and end of strings
+        .replace(/^\\"|"$/g, '"')
+        // Fix quotes around property names and string values
+        .replace(/\\?"([^"\\]*(?:\\.[^"\\]*)*)"\\?/g, '"$1"');
+}
+
 export async function POST(req) {
     const { prompt, model = 'gemini', environment = 'react' } = await req.json();
     
@@ -39,12 +52,16 @@ export async function POST(req) {
         // Try to parse JSON response
         let parsedResponse;
         try {
-            parsedResponse = JSON.parse(resp);
+            // Sanitize the response before parsing
+            const sanitizedResp = sanitizeJsonString(resp);
+            parsedResponse = JSON.parse(sanitizedResp);
         } catch (parseError) {
             // If parsing fails, try to extract JSON from the response
             const jsonMatch = resp.match(/```json\n([\s\S]*?)\n```/);
             if (jsonMatch) {
-                parsedResponse = JSON.parse(jsonMatch[1]);
+                // Sanitize the extracted JSON before parsing
+                const sanitizedJson = sanitizeJsonString(jsonMatch[1]);
+                parsedResponse = JSON.parse(sanitizedJson);
             } else {
                 throw new Error('Invalid JSON response from AI model');
             }
