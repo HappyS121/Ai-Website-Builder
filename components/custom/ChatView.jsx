@@ -1,6 +1,6 @@
 "use client"
 import { MessagesContext } from '@/context/MessagesContext';
-import { Send, Bot, User, Sparkles, Loader2Icon } from 'lucide-react';
+import { Send, Bot, User, Loader2Icon } from 'lucide-react';
 import { api } from '@/convex/_generated/api';
 import { useConvex } from 'convex/react';
 import { useParams } from 'next/navigation';
@@ -30,7 +30,6 @@ function ChatView() {
         });
         setMessages(result?.messages);
         setEnvironment(result?.environment || 'react');
-        console.log(result);
     }
 
     useEffect(() => {
@@ -82,99 +81,73 @@ function ChatView() {
     }
 
     return (
-        <div className="relative h-[85vh] flex flex-col liquid-glass rounded-3xl overflow-hidden">
-            {/* Environment Header */}
-            <div className="liquid-glass border-b border-blue-500/20 px-6 py-4">
+        <div className="h-full flex flex-col liquid-glass rounded-2xl overflow-hidden">
+            {/* Minimal Header */}
+            <div className="border-b border-blue-500/10 px-4 py-3">
                 <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <div className={`flex items-center gap-3 px-4 py-2 rounded-full border ${
-                            environment === 'react' 
-                                ? 'bg-blue-500/10 text-blue-400 border-blue-500/30' 
-                                : 'bg-orange-500/10 text-orange-400 border-orange-500/30'
-                        } animate-pulse-glow`}>
-                            <div className="w-2 h-2 rounded-full bg-current animate-pulse"></div>
-                            <span className="font-bold">
-                                {environment === 'react' ? 'React Environment' : 'HTML Environment'}
-                            </span>
-                        </div>
+                    <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium ${
+                        environment === 'react' 
+                            ? 'bg-blue-500/10 text-blue-400' 
+                            : 'bg-orange-500/10 text-orange-400'
+                    }`}>
+                        <div className="w-1.5 h-1.5 rounded-full bg-current"></div>
+                        {environment === 'react' ? 'React' : 'HTML'}
                     </div>
-                    
-                    <div className="flex items-center gap-2 text-slate-400 text-sm font-medium">
-                        <Sparkles className="h-4 w-4 animate-spin-glow" />
-                        <span>AI Assistant Active</span>
-                    </div>
+                    <div className="text-xs text-slate-500">AI Chat</div>
                 </div>
             </div>
 
-            {/* Chat Messages */}
-            <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
-                <div className="max-w-4xl mx-auto space-y-6">
+            {/* Messages */}
+            <div className="flex-1 overflow-y-auto custom-scrollbar p-4">
+                <div className="space-y-4">
                     {Array.isArray(messages) && messages?.map((msg, index) => (
                         <div
                             key={index}
-                            className={`flex gap-4 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                            className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                         >
-                            {/* Avatar */}
+                            {/* AI Avatar */}
                             {msg.role === 'ai' && (
-                                <div className="flex-shrink-0">
-                                    <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center shadow-2xl animate-pulse-glow">
-                                        <Bot className="h-6 w-6 text-white" />
-                                    </div>
+                                <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <Bot className="h-4 w-4 text-white" />
                                 </div>
                             )}
                             
-                            {/* Message Content */}
-                            <div className={`max-w-3xl ${msg.role === 'user' ? 'order-first' : ''}`}>
-                                <div className={`p-6 rounded-3xl shadow-2xl ${
+                            {/* Message */}
+                            <div className={`max-w-[85%] ${msg.role === 'user' ? 'order-first' : ''}`}>
+                                <div className={`p-3 rounded-xl text-sm ${
                                     msg.role === 'user' 
                                         ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white' 
-                                        : 'liquid-glass text-slate-100'
-                                } hover-lift`}>
+                                        : 'bg-slate-800/50 text-slate-100 border border-slate-700/50'
+                                }`}>
                                     {msg.role === 'ai' ? (
-                                        <ReactMarkdown className="prose prose-invert max-w-none prose-pre:bg-slate-800 prose-pre:border prose-pre:border-slate-600 prose-pre:rounded-xl">
+                                        <ReactMarkdown className="prose prose-sm prose-invert max-w-none prose-pre:bg-slate-900 prose-pre:border prose-pre:border-slate-600 prose-pre:rounded-lg prose-pre:text-xs">
                                             {msg.content}
                                         </ReactMarkdown>
                                     ) : (
-                                        <p className="text-white font-medium">{msg.content}</p>
+                                        <p>{msg.content}</p>
                                     )}
-                                </div>
-                                
-                                {/* Timestamp */}
-                                <div className={`text-xs text-slate-400 mt-3 font-medium ${
-                                    msg.role === 'user' ? 'text-right' : 'text-left'
-                                }`}>
-                                    {msg.role === 'user' ? 'You' : 'AI Assistant'} • Just now
                                 </div>
                             </div>
                             
                             {/* User Avatar */}
                             {msg.role === 'user' && (
-                                <div className="flex-shrink-0">
-                                    <div className="w-12 h-12 liquid-glass rounded-2xl flex items-center justify-center shadow-2xl">
-                                        <User className="h-6 w-6 text-blue-400" />
-                                    </div>
+                                <div className="w-8 h-8 bg-slate-700 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <User className="h-4 w-4 text-slate-300" />
                                 </div>
                             )}
                         </div>
                     ))}
                     
-                    {/* Loading Message */}
+                    {/* Loading */}
                     {loading && (
-                        <div className="flex gap-4 justify-start">
-                            <div className="flex-shrink-0">
-                                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center shadow-2xl animate-pulse-glow">
-                                    <Bot className="h-6 w-6 text-white" />
-                                </div>
+                        <div className="flex gap-3 justify-start">
+                            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
+                                <Bot className="h-4 w-4 text-white" />
                             </div>
-                            <div className="liquid-glass p-6 rounded-3xl shadow-2xl">
-                                <div className="flex items-center gap-4 text-slate-300">
-                                    <Loader2Icon className="animate-spin-glow h-6 w-6 text-blue-400" />
-                                    <div className="flex gap-1">
-                                        <div className="w-3 h-3 bg-blue-400 rounded-full animate-bounce"></div>
-                                        <div className="w-3 h-3 bg-cyan-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                                        <div className="w-3 h-3 bg-teal-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-                                    </div>
-                                    <span className="font-bold">AI is thinking...</span>
+                            <div className="bg-slate-800/50 border border-slate-700/50 p-3 rounded-xl">
+                                <div className="flex items-center gap-2 text-slate-400 text-sm">
+                                    <Loader2Icon className="animate-spin h-4 w-4" />
+                                    <span>Thinking...</span>
                                 </div>
                             </div>
                         </div>
@@ -182,52 +155,32 @@ function ChatView() {
                 </div>
             </div>
 
-            {/* Input Section */}
-            <div className="border-t border-blue-500/20 liquid-glass p-6">
-                <div className="max-w-4xl mx-auto">
-                    <div className="relative group">
-                        {/* Glow Effect */}
-                        <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-3xl blur opacity-20 group-hover:opacity-30 transition duration-300"></div>
-                        
-                        {/* Input Container */}
-                        <div className="relative liquid-glass rounded-3xl p-6">
-                            <div className="flex gap-4">
-                                <textarea
-                                    placeholder={`Ask about your ${environment} project...`}
-                                    value={userInput}
-                                    onChange={(event) => setUserInput(event.target.value)}
-                                    className="flex-1 input-liquid h-24 resize-none font-mono"
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Enter' && !e.shiftKey) {
-                                            e.preventDefault();
-                                            if (userInput?.trim()) {
-                                                onGenerate(userInput);
-                                            }
-                                        }
-                                    }}
-                                />
-                                
-                                {/* Send Button */}
-                                {userInput && (
-                                    <button
-                                        onClick={() => onGenerate(userInput)}
-                                        className="btn-liquid-primary flex items-center justify-center w-20 h-20 rounded-2xl"
-                                    >
-                                        <Send className="h-7 w-7" />
-                                    </button>
-                                )}
-                            </div>
-                            
-                            {/* Footer */}
-                            <div className="flex justify-between items-center mt-4 text-xs text-slate-400 font-medium">
-                                <span>Press Enter to send, Shift+Enter for new line</span>
-                                <div className="flex items-center gap-2">
-                                    <Sparkles className="h-4 w-4 hover:text-blue-400 transition-colors duration-200" />
-                                    <span>Powered by AI</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            {/* Input */}
+            <div className="border-t border-blue-500/10 p-4">
+                <div className="flex gap-2">
+                    <textarea
+                        placeholder={`Ask about your ${environment} project...`}
+                        value={userInput}
+                        onChange={(event) => setUserInput(event.target.value)}
+                        className="flex-1 bg-slate-800/50 border border-slate-700/50 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:border-blue-500/50 focus:outline-none resize-none h-16"
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' && !e.shiftKey) {
+                                e.preventDefault();
+                                if (userInput?.trim()) {
+                                    onGenerate(userInput);
+                                }
+                            }
+                        }}
+                    />
+                    
+                    {userInput && (
+                        <button
+                            onClick={() => onGenerate(userInput)}
+                            className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white p-2 rounded-lg transition-all duration-200 flex items-center justify-center w-12 h-12"
+                        >
+                            <Send className="h-4 w-4" />
+                        </button>
+                    )}
                 </div>
             </div>
         </div>
