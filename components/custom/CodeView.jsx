@@ -19,7 +19,7 @@ import { UpdateFiles } from '@/convex/workspace';
 import { useConvex, useMutation } from 'convex/react';
 import { useParams } from 'next/navigation';
 import { api } from '@/convex/_generated/api';
-import { Loader2Icon, Download } from 'lucide-react';
+import { Loader2Icon, Download, FileText, Eye } from 'lucide-react';
 import JSZip from 'jszip';
 
 function CodeView() {
@@ -28,6 +28,7 @@ function CodeView() {
     const [activeTab, setActiveTab] = useState('code');
     const [files,setFiles]=useState(Lookup?.DEFAULT_FILE);
     const [environment, setEnvironment] = useState('react');
+    const [selectedFile, setSelectedFile] = useState('/index.html');
     const {messages,setMessages}=useContext(MessagesContext);
     const { selectedModel } = useModel();
     const { selectedEnvironment } = useEnvironment();
@@ -55,6 +56,11 @@ function CodeView() {
         const processedFiles = preprocessFiles(result?.fileData || {});
         const mergedFiles = {...defaultFiles, ...processedFiles};
         setFiles(mergedFiles);
+
+        // Set default selected file based on environment
+        if (workspaceEnvironment === 'html') {
+            setSelectedFile('/index.html');
+        }
     }
 
     // Add file preprocessing function
@@ -172,7 +178,17 @@ function CodeView() {
         }
     };
 
-    // Determine if we should use Sandpack or simple preview
+    // Get file extension for syntax highlighting
+    const getFileLanguage = (filename) => {
+        if (filename.endsWith('.html')) return 'html';
+        if (filename.endsWith('.css')) return 'css';
+        if (filename.endsWith('.js')) return 'javascript';
+        if (filename.endsWith('.jsx')) return 'jsx';
+        if (filename.endsWith('.json')) return 'json';
+        return 'text';
+    };
+
+    // Determine if we should use Sandpack or custom HTML editor
     const isHtmlProject = environment === 'html';
 
     return (
@@ -214,44 +230,96 @@ function CodeView() {
             </div>
 
             {isHtmlProject ? (
-                // Simple HTML preview for HTML projects
-                <div className="relative">
+                // Enhanced HTML editor interface
+                <div className="relative bg-[#1e1e1e] h-[80vh]">
                     {activeTab === 'code' ? (
-                        <div className="bg-gray-900 h-[80vh] overflow-auto">
-                            <div className="flex">
-                                <div className="w-1/4 bg-gray-800 border-r border-gray-700">
-                                    <div className="p-4">
-                                        <h3 className="text-white font-medium mb-4">Files</h3>
-                                        {Object.keys(files).map((filename) => (
-                                            <div key={filename} className="text-gray-300 text-sm py-1 px-2 hover:bg-gray-700 rounded cursor-pointer">
-                                                {filename}
-                                            </div>
-                                        ))}
+                        <div className="flex h-full">
+                            {/* File Explorer */}
+                            <div className="w-64 bg-[#252526] border-r border-gray-700 flex flex-col">
+                                <div className="p-3 border-b border-gray-700">
+                                    <h3 className="text-white font-medium text-sm flex items-center gap-2">
+                                        <FileText className="h-4 w-4" />
+                                        Files
+                                    </h3>
+                                </div>
+                                <div className="flex-1 overflow-y-auto">
+                                    {Object.keys(files).map((filename) => (
+                                        <div
+                                            key={filename}
+                                            onClick={() => setSelectedFile(filename)}
+                                            className={`flex items-center gap-2 px-3 py-2 text-sm cursor-pointer transition-colors ${
+                                                selectedFile === filename
+                                                    ? 'bg-blue-500/20 text-blue-400 border-r-2 border-blue-500'
+                                                    : 'text-gray-300 hover:bg-gray-700/50'
+                                            }`}
+                                        >
+                                            <div className={`w-2 h-2 rounded-full ${
+                                                filename.endsWith('.html') ? 'bg-orange-500' :
+                                                filename.endsWith('.css') ? 'bg-blue-500' :
+                                                filename.endsWith('.js') ? 'bg-yellow-500' :
+                                                'bg-gray-500'
+                                            }`} />
+                                            <span>{filename.replace('/', '')}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Code Editor */}
+                            <div className="flex-1 flex flex-col">
+                                {/* File Tab */}
+                                <div className="bg-[#2d2d30] border-b border-gray-700 px-4 py-2">
+                                    <div className="flex items-center gap-2">
+                                        <div className={`w-2 h-2 rounded-full ${
+                                            selectedFile.endsWith('.html') ? 'bg-orange-500' :
+                                            selectedFile.endsWith('.css') ? 'bg-blue-500' :
+                                            selectedFile.endsWith('.js') ? 'bg-yellow-500' :
+                                            'bg-gray-500'
+                                        }`} />
+                                        <span className="text-gray-300 text-sm font-medium">
+                                            {selectedFile.replace('/', '')}
+                                        </span>
                                     </div>
                                 </div>
-                                <div className="flex-1">
-                                    <div className="p-4">
-                                        <pre className="text-gray-300 text-sm overflow-auto">
-                                            {Object.entries(files).map(([filename, content]) => (
-                                                <div key={filename} className="mb-8">
-                                                    <div className="text-blue-400 font-medium mb-2">{filename}</div>
-                                                    <code className="block bg-gray-800 p-4 rounded">
-                                                        {typeof content === 'string' ? content : content.code}
-                                                    </code>
-                                                </div>
-                                            ))}
-                                        </pre>
-                                    </div>
+
+                                {/* Code Content */}
+                                <div className="flex-1 overflow-auto">
+                                    <pre className="p-4 text-sm text-gray-300 font-mono leading-relaxed">
+                                        <code className="block">
+                                            {typeof files[selectedFile] === 'string' 
+                                                ? files[selectedFile] 
+                                                : files[selectedFile]?.code || '// File content not available'
+                                            }
+                                        </code>
+                                    </pre>
                                 </div>
                             </div>
                         </div>
                     ) : (
-                        <div className="h-[80vh]">
-                            <iframe
-                                srcDoc={files['/index.html']?.code || files['/index.html']}
-                                className="w-full h-full border-0"
-                                title="HTML Preview"
-                            />
+                        // Enhanced Preview
+                        <div className="h-full flex flex-col">
+                            {/* Preview Header */}
+                            <div className="bg-[#2d2d30] border-b border-gray-700 px-4 py-2">
+                                <div className="flex items-center gap-2">
+                                    <Eye className="h-4 w-4 text-gray-400" />
+                                    <span className="text-gray-300 text-sm font-medium">Preview</span>
+                                    <div className="ml-auto flex items-center gap-2">
+                                        <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                                        <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                                        <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Preview Content */}
+                            <div className="flex-1 bg-white">
+                                <iframe
+                                    srcDoc={files['/index.html']?.code || files['/index.html']}
+                                    className="w-full h-full border-0"
+                                    title="HTML Preview"
+                                    sandbox="allow-scripts allow-same-origin"
+                                />
+                            </div>
                         </div>
                     )}
                 </div>
