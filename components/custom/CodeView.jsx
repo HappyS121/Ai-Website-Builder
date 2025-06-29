@@ -19,7 +19,7 @@ import { UpdateFiles } from '@/convex/workspace';
 import { useConvex, useMutation } from 'convex/react';
 import { useParams } from 'next/navigation';
 import { api } from '@/convex/_generated/api';
-import { Loader2Icon, Download, FileText, Eye } from 'lucide-react';
+import { Loader2Icon, Download, FileText, Eye, Save } from 'lucide-react';
 import JSZip from 'jszip';
 
 function CodeView() {
@@ -29,6 +29,7 @@ function CodeView() {
     const [files,setFiles]=useState(Lookup?.DEFAULT_FILE);
     const [environment, setEnvironment] = useState('react');
     const [selectedFile, setSelectedFile] = useState('/index.html');
+    const [editingContent, setEditingContent] = useState('');
     const {messages,setMessages}=useContext(MessagesContext);
     const { selectedModel } = useModel();
     const { selectedEnvironment } = useEnvironment();
@@ -60,8 +61,19 @@ function CodeView() {
         // Set default selected file based on environment
         if (workspaceEnvironment === 'html') {
             setSelectedFile('/index.html');
+            setEditingContent(mergedFiles['/index.html']?.code || mergedFiles['/index.html'] || '');
         }
     }
+
+    // Update editing content when selected file changes
+    useEffect(() => {
+        if (selectedFile && files[selectedFile]) {
+            const content = typeof files[selectedFile] === 'string' 
+                ? files[selectedFile] 
+                : files[selectedFile]?.code || '';
+            setEditingContent(content);
+        }
+    }, [selectedFile, files]);
 
     // Add file preprocessing function
     const preprocessFiles = (files) => {
@@ -116,6 +128,60 @@ function CodeView() {
         }
         setLoading(false);
     }
+
+    // Save edited content
+    const saveFileContent = async () => {
+        if (!selectedFile || !editingContent) return;
+
+        const updatedFiles = {
+            ...files,
+            [selectedFile]: { code: editingContent }
+        };
+        
+        setFiles(updatedFiles);
+
+        // Save to database
+        try {
+            await UpdateFiles({
+                workspaceId: id,
+                files: updatedFiles
+            });
+        } catch (error) {
+            console.error('Error saving file:', error);
+        }
+    };
+
+    // Generate combined HTML for preview
+    const generatePreviewHTML = () => {
+        const htmlContent = files['/index.html']?.code || files['/index.html'] || '';
+        const cssContent = files['/style.css']?.code || files['/style.css'] || '';
+        const jsContent = files['/script.js']?.code || files['/script.js'] || '';
+
+        // Inject CSS and JS into HTML
+        let previewHTML = htmlContent;
+        
+        // Add CSS
+        if (cssContent) {
+            const cssTag = `<style>${cssContent}</style>`;
+            if (previewHTML.includes('</head>')) {
+                previewHTML = previewHTML.replace('</head>', `${cssTag}\n</head>`);
+            } else {
+                previewHTML = `<head>${cssTag}</head>${previewHTML}`;
+            }
+        }
+
+        // Add JS
+        if (jsContent) {
+            const jsTag = `<script>${jsContent}</script>`;
+            if (previewHTML.includes('</body>')) {
+                previewHTML = previewHTML.replace('</body>', `${jsTag}\n</body>`);
+            } else {
+                previewHTML = `${previewHTML}<script>${jsContent}</script>`;
+            }
+        }
+
+        return previewHTML;
+    };
     
     const downloadFiles = async () => {
         try {
@@ -178,16 +244,6 @@ function CodeView() {
         }
     };
 
-    // Get file extension for syntax highlighting
-    const getFileLanguage = (filename) => {
-        if (filename.endsWith('.html')) return 'html';
-        if (filename.endsWith('.css')) return 'css';
-        if (filename.endsWith('.js')) return 'javascript';
-        if (filename.endsWith('.jsx')) return 'jsx';
-        if (filename.endsWith('.json')) return 'json';
-        return 'text';
-    };
-
     // Determine if we should use Sandpack or custom HTML editor
     const isHtmlProject = environment === 'html';
 
@@ -218,28 +274,39 @@ function CodeView() {
                         </div>
                     </div>
                     
-                    {/* Download Button */}
-                    <button
-                        onClick={downloadFiles}
-                        className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full transition-colors duration-200"
-                    >
-                        <Download className="h-4 w-4" />
-                        <span>Download Files</span>
-                    </button>
+                    {/* Action Buttons */}
+                    <div className="flex items-center gap-2">
+                        {isHtmlProject && activeTab === 'code' && (
+                            <button
+                                onClick={saveFileContent}
+                                className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-lg transition-colors duration-200"
+                            >
+                                <Save className="h-4 w-4" />
+                                <span>Save</span>
+                            </button>
+                        )}
+                        <button
+                            onClick={downloadFiles}
+                            className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors duration-200"
+                        >
+                            <Download className="h-4 w-4" />
+                            <span>Download</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
             {isHtmlProject ? (
-                // Enhanced HTML editor interface
+                // Custom HTML editor interface similar to Sandpack
                 <div className="relative bg-[#1e1e1e] h-[80vh]">
                     {activeTab === 'code' ? (
                         <div className="flex h-full">
-                            {/* File Explorer */}
-                            <div className="w-64 bg-[#252526] border-r border-gray-700 flex flex-col">
-                                <div className="p-3 border-b border-gray-700">
+                            {/* File Explorer - Similar to Sandpack */}
+                            <div className="w-64 bg-[#252526] border-r border-gray-600 flex flex-col">
+                                <div className="p-3 border-b border-gray-600 bg-[#2d2d30]">
                                     <h3 className="text-white font-medium text-sm flex items-center gap-2">
                                         <FileText className="h-4 w-4" />
-                                        Files
+                                        Explorer
                                     </h3>
                                 </div>
                                 <div className="flex-1 overflow-y-auto">
@@ -249,8 +316,8 @@ function CodeView() {
                                             onClick={() => setSelectedFile(filename)}
                                             className={`flex items-center gap-2 px-3 py-2 text-sm cursor-pointer transition-colors ${
                                                 selectedFile === filename
-                                                    ? 'bg-blue-500/20 text-blue-400 border-r-2 border-blue-500'
-                                                    : 'text-gray-300 hover:bg-gray-700/50'
+                                                    ? 'bg-[#37373d] text-white border-l-2 border-blue-500'
+                                                    : 'text-gray-300 hover:bg-[#2a2d2e]'
                                             }`}
                                         >
                                             <div className={`w-2 h-2 rounded-full ${
@@ -265,10 +332,10 @@ function CodeView() {
                                 </div>
                             </div>
 
-                            {/* Code Editor */}
-                            <div className="flex-1 flex flex-col">
+                            {/* Code Editor - Similar to Sandpack */}
+                            <div className="flex-1 flex flex-col bg-[#1e1e1e]">
                                 {/* File Tab */}
-                                <div className="bg-[#2d2d30] border-b border-gray-700 px-4 py-2">
+                                <div className="bg-[#2d2d30] border-b border-gray-600 px-4 py-2 flex items-center justify-between">
                                     <div className="flex items-center gap-2">
                                         <div className={`w-2 h-2 rounded-full ${
                                             selectedFile.endsWith('.html') ? 'bg-orange-500' :
@@ -282,28 +349,33 @@ function CodeView() {
                                     </div>
                                 </div>
 
-                                {/* Code Content */}
-                                <div className="flex-1 overflow-auto">
-                                    <pre className="p-4 text-sm text-gray-300 font-mono leading-relaxed">
-                                        <code className="block">
-                                            {typeof files[selectedFile] === 'string' 
-                                                ? files[selectedFile] 
-                                                : files[selectedFile]?.code || '// File content not available'
-                                            }
-                                        </code>
-                                    </pre>
+                                {/* Editable Code Content */}
+                                <div className="flex-1 overflow-hidden">
+                                    <textarea
+                                        value={editingContent}
+                                        onChange={(e) => setEditingContent(e.target.value)}
+                                        className="w-full h-full p-4 bg-[#1e1e1e] text-gray-300 font-mono text-sm leading-relaxed resize-none outline-none border-none"
+                                        style={{
+                                            fontFamily: 'Monaco, Menlo, "Ubuntu Mono", monospace',
+                                            tabSize: 2
+                                        }}
+                                        placeholder="Start typing your code..."
+                                        spellCheck={false}
+                                    />
                                 </div>
                             </div>
                         </div>
                     ) : (
-                        // Enhanced Preview
-                        <div className="h-full flex flex-col">
+                        // Enhanced Preview - Similar to Sandpack
+                        <div className="h-full flex flex-col bg-[#1e1e1e]">
                             {/* Preview Header */}
-                            <div className="bg-[#2d2d30] border-b border-gray-700 px-4 py-2">
-                                <div className="flex items-center gap-2">
-                                    <Eye className="h-4 w-4 text-gray-400" />
-                                    <span className="text-gray-300 text-sm font-medium">Preview</span>
-                                    <div className="ml-auto flex items-center gap-2">
+                            <div className="bg-[#2d2d30] border-b border-gray-600 px-4 py-2">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <Eye className="h-4 w-4 text-gray-400" />
+                                        <span className="text-gray-300 text-sm font-medium">Browser</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
                                         <div className="w-3 h-3 rounded-full bg-red-500"></div>
                                         <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
                                         <div className="w-3 h-3 rounded-full bg-green-500"></div>
@@ -314,10 +386,10 @@ function CodeView() {
                             {/* Preview Content */}
                             <div className="flex-1 bg-white">
                                 <iframe
-                                    srcDoc={files['/index.html']?.code || files['/index.html']}
+                                    srcDoc={generatePreviewHTML()}
                                     className="w-full h-full border-0"
                                     title="HTML Preview"
-                                    sandbox="allow-scripts allow-same-origin"
+                                    sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
                                 />
                             </div>
                         </div>
