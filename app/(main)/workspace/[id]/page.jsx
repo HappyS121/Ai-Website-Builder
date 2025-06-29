@@ -13,7 +13,7 @@ const Workspace = () => {
                 
                 {/* Floating Particles */}
                 <div className="particles">
-                    {Array.from({ length: 20 }).map((_, i) => (
+                    {Array.from({ length: 15 }).map((_, i) => (
                         <div
                             key={i}
                             className="particle"
@@ -29,8 +29,8 @@ const Workspace = () => {
             </div>
 
             {/* Content */}
-            <div className='relative z-10 p-8'>
-                <div className='grid grid-cols-1 lg:grid-cols-4 gap-8 h-[calc(100vh-4rem)]'>
+            <div className='relative z-10 p-4'>
+                <div className='grid grid-cols-1 lg:grid-cols-4 gap-4 h-[calc(100vh-2rem)]'>
                     {/* Chat Panel */}
                     <div className='lg:col-span-1'>
                         <ChatView />

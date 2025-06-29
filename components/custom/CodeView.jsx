@@ -16,7 +16,7 @@ import { useEffect } from 'react';
 import { useConvex, useMutation } from 'convex/react';
 import { useParams } from 'next/navigation';
 import { api } from '@/convex/_generated/api';
-import { Loader2Icon, Download, Code, Eye, FolderOpen, Zap, Sparkles } from 'lucide-react';
+import { Loader2Icon, Download, Code, Eye, FolderOpen, Zap } from 'lucide-react';
 import JSZip from 'jszip';
 
 function CodeView() {
@@ -174,33 +174,26 @@ function CodeView() {
     ];
 
     return (
-        <div className='relative liquid-glass rounded-3xl overflow-hidden'>
-            {/* macOS-style Header */}
-            <div className='macos-titlebar'>
-                <div className='flex items-center justify-between w-full'>
-                    <div className='flex items-center gap-6'>
-                        {/* macOS Traffic Lights */}
-                        <div className='macos-traffic-lights'>
-                            <div className='macos-traffic-light close'></div>
-                            <div className='macos-traffic-light minimize'></div>
-                            <div className='macos-traffic-light maximize'></div>
-                        </div>
-                        
+        <div className='relative liquid-glass rounded-2xl overflow-hidden'>
+            {/* Compact Header */}
+            <div className='liquid-glass border-b border-blue-500/20 px-4 py-2'>
+                <div className='flex items-center justify-between'>
+                    <div className='flex items-center gap-4'>
                         {/* Tab Selector */}
-                        <div className='flex items-center liquid-glass p-1 rounded-xl border border-blue-500/30'>
+                        <div className='flex items-center liquid-glass p-1 rounded-lg border border-blue-500/30'>
                             {tabs.map((tab) => {
                                 const IconComponent = tab.icon;
                                 return (
                                     <button
                                         key={tab.id}
                                         onClick={() => setActiveTab(tab.id)}
-                                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all duration-300 ${
+                                        className={`flex items-center gap-1 px-3 py-1 rounded-md text-xs font-bold transition-all duration-300 ${
                                             activeTab === tab.id
-                                                ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg animate-pulse-glow'
+                                                ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg'
                                                 : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
                                         }`}
                                     >
-                                        <IconComponent className="h-4 w-4" />
+                                        <IconComponent className="h-3 w-3" />
                                         {tab.name}
                                     </button>
                                 );
@@ -208,37 +201,37 @@ function CodeView() {
                         </div>
                         
                         {/* Environment Badge */}
-                        <div className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-bold ${
+                        <div className={`flex items-center gap-1 px-3 py-1 rounded-full border text-xs font-bold ${
                             environment === 'react' 
-                                ? 'bg-blue-500/10 text-blue-400 border-blue-500/30 animate-pulse-glow' 
-                                : 'bg-orange-500/10 text-orange-400 border-orange-500/30 animate-pulse-glow-turquoise'
+                                ? 'bg-blue-500/10 text-blue-400 border-blue-500/30' 
+                                : 'bg-orange-500/10 text-orange-400 border-orange-500/30'
                         }`}>
-                            <div className="w-2 h-2 rounded-full bg-current animate-pulse"></div>
-                            {environment === 'react' ? 'React Environment' : 'HTML/CSS/JS Environment'}
+                            <div className="w-1.5 h-1.5 rounded-full bg-current animate-pulse"></div>
+                            {environment === 'react' ? 'React' : 'HTML/CSS/JS'}
                         </div>
 
                         {/* File Count */}
-                        <div className="flex items-center gap-2 text-slate-400 text-sm font-medium">
-                            <FolderOpen className="h-4 w-4" />
-                            <span>{Object.keys(files).length} files</span>
+                        <div className="flex items-center gap-1 text-slate-400 text-xs">
+                            <FolderOpen className="h-3 w-3" />
+                            <span>{Object.keys(files).length}</span>
                         </div>
                     </div>
                     
                     {/* Actions */}
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-3">
                         {/* Status */}
-                        <div className="flex items-center gap-2 text-emerald-400 text-sm font-bold">
-                            <Zap className="h-4 w-4 animate-pulse" />
-                            <span>Live Preview</span>
+                        <div className="flex items-center gap-1 text-emerald-400 text-xs font-bold">
+                            <Zap className="h-3 w-3" />
+                            <span>Live</span>
                         </div>
                         
                         {/* Download Button */}
                         <button
                             onClick={downloadFiles}
-                            className="btn-liquid-primary flex items-center gap-2 px-4 py-2 text-sm"
+                            className="btn-liquid-primary flex items-center gap-1 px-3 py-1 text-xs rounded-lg"
                         >
-                            <Download className="h-4 w-4" />
-                            <span>Export Project</span>
+                            <Download className="h-3 w-3" />
+                            <span>Export</span>
                         </button>
                     </div>
                 </div>
@@ -277,8 +270,8 @@ function CodeView() {
                     font: {
                         body: 'Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif',
                         mono: 'JetBrains Mono, Fira Code, Monaco, Consolas, monospace',
-                        size: '14px',
-                        lineHeight: '1.6'
+                        size: '13px',
+                        lineHeight: '1.5'
                     }
                 }}
                 customSetup={{
@@ -294,23 +287,23 @@ function CodeView() {
                     showLineNumbers: true,
                     showInlineErrors: true,
                     wrapContent: true,
-                    editorHeight: '80vh'
+                    editorHeight: '82vh'
                 }}
             >
-                <div className="relative macos-window">
+                <div className="relative">
                     <SandpackLayout>
                         {activeTab === 'code' ? (
                             <>
                                 <SandpackFileExplorer 
                                     style={{ 
-                                        height: '80vh',
+                                        height: '82vh',
                                         backgroundColor: '#0f172a',
                                         borderRight: '1px solid #334155'
                                     }} 
                                 />
                                 <SandpackCodeEditor 
                                     style={{ 
-                                        height: '80vh',
+                                        height: '82vh',
                                         backgroundColor: '#0f172a'
                                     }}
                                     showTabs
@@ -322,7 +315,7 @@ function CodeView() {
                         ) : (
                             <SandpackPreview 
                                 style={{ 
-                                    height: '80vh',
+                                    height: '82vh',
                                     backgroundColor: '#0f172a'
                                 }} 
                                 showNavigator={true}
@@ -337,23 +330,23 @@ function CodeView() {
             {/* Loading Overlay */}
             {loading && (
                 <div className='absolute inset-0 liquid-glass flex items-center justify-center z-50'>
-                    <div className="liquid-glass p-10 rounded-3xl text-center hover-lift">
-                        <div className="flex items-center justify-center mb-6">
+                    <div className="liquid-glass p-6 rounded-2xl text-center">
+                        <div className="flex items-center justify-center mb-4">
                             <div className="relative">
-                                <Loader2Icon className='animate-spin-glow h-16 w-16 text-blue-400'/>
-                                <div className="absolute inset-0 h-16 w-16 border-2 border-cyan-400/30 rounded-full animate-pulse"></div>
+                                <Loader2Icon className='animate-spin-glow h-12 w-12 text-blue-400'/>
+                                <div className="absolute inset-0 h-12 w-12 border-2 border-cyan-400/30 rounded-full animate-pulse"></div>
                             </div>
                         </div>
-                        <h3 className='text-white text-2xl font-bold mb-3 text-glow'>
+                        <h3 className='text-white text-lg font-bold mb-2'>
                             Generating {environment} Project
                         </h3>
-                        <p className="text-slate-400 font-medium">
+                        <p className="text-slate-400 text-sm">
                             AI is crafting your code...
                         </p>
-                        <div className="flex justify-center gap-2 mt-6">
-                            <div className="w-3 h-3 bg-blue-400 rounded-full animate-bounce"></div>
-                            <div className="w-3 h-3 bg-cyan-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                            <div className="w-3 h-3 bg-teal-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                        <div className="flex justify-center gap-1 mt-3">
+                            <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div>
+                            <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                            <div className="w-2 h-2 bg-teal-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
                         </div>
                     </div>
                 </div>
