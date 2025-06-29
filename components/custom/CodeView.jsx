@@ -175,19 +175,19 @@ function CodeView() {
 
     return (
         <div className='relative liquid-glass rounded-2xl overflow-hidden'>
-            {/* Compact Header */}
-            <div className='liquid-glass border-b border-blue-500/20 px-4 py-2'>
+            {/* Ultra Compact Header */}
+            <div className='liquid-glass border-b border-blue-500/20 px-3 py-1'>
                 <div className='flex items-center justify-between'>
-                    <div className='flex items-center gap-4'>
+                    <div className='flex items-center gap-3'>
                         {/* Tab Selector */}
-                        <div className='flex items-center liquid-glass p-1 rounded-lg border border-blue-500/30'>
+                        <div className='flex items-center liquid-glass p-0.5 rounded-lg border border-blue-500/30'>
                             {tabs.map((tab) => {
                                 const IconComponent = tab.icon;
                                 return (
                                     <button
                                         key={tab.id}
                                         onClick={() => setActiveTab(tab.id)}
-                                        className={`flex items-center gap-1 px-3 py-1 rounded-md text-xs font-bold transition-all duration-300 ${
+                                        className={`flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-bold transition-all duration-300 ${
                                             activeTab === tab.id
                                                 ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg'
                                                 : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
@@ -201,13 +201,13 @@ function CodeView() {
                         </div>
                         
                         {/* Environment Badge */}
-                        <div className={`flex items-center gap-1 px-3 py-1 rounded-full border text-xs font-bold ${
+                        <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full border text-xs font-bold ${
                             environment === 'react' 
                                 ? 'bg-blue-500/10 text-blue-400 border-blue-500/30' 
                                 : 'bg-orange-500/10 text-orange-400 border-orange-500/30'
                         }`}>
-                            <div className="w-1.5 h-1.5 rounded-full bg-current animate-pulse"></div>
-                            {environment === 'react' ? 'React' : 'HTML/CSS/JS'}
+                            <div className="w-1 h-1 rounded-full bg-current animate-pulse"></div>
+                            {environment === 'react' ? 'React' : 'HTML'}
                         </div>
 
                         {/* File Count */}
@@ -218,7 +218,7 @@ function CodeView() {
                     </div>
                     
                     {/* Actions */}
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
                         {/* Status */}
                         <div className="flex items-center gap-1 text-emerald-400 text-xs font-bold">
                             <Zap className="h-3 w-3" />
@@ -228,7 +228,7 @@ function CodeView() {
                         {/* Download Button */}
                         <button
                             onClick={downloadFiles}
-                            className="btn-liquid-primary flex items-center gap-1 px-3 py-1 text-xs rounded-lg"
+                            className="btn-liquid-primary flex items-center gap-1 px-2 py-0.5 text-xs rounded-lg"
                         >
                             <Download className="h-3 w-3" />
                             <span>Export</span>
@@ -287,7 +287,7 @@ function CodeView() {
                     showLineNumbers: true,
                     showInlineErrors: true,
                     wrapContent: true,
-                    editorHeight: '82vh'
+                    editorHeight: '84vh'
                 }}
             >
                 <div className="relative">
@@ -296,14 +296,14 @@ function CodeView() {
                             <>
                                 <SandpackFileExplorer 
                                     style={{ 
-                                        height: '82vh',
+                                        height: '84vh',
                                         backgroundColor: '#0f172a',
                                         borderRight: '1px solid #334155'
                                     }} 
                                 />
                                 <SandpackCodeEditor 
                                     style={{ 
-                                        height: '82vh',
+                                        height: '84vh',
                                         backgroundColor: '#0f172a'
                                     }}
                                     showTabs
@@ -315,7 +315,7 @@ function CodeView() {
                         ) : (
                             <SandpackPreview 
                                 style={{ 
-                                    height: '82vh',
+                                    height: '84vh',
                                     backgroundColor: '#0f172a'
                                 }} 
                                 showNavigator={true}
