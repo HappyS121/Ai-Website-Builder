@@ -134,51 +134,6 @@ function Hero() {
 
             <div className="container mx-auto px-6 py-20 relative z-10">
                 <div className="flex flex-col items-center justify-center space-y-16">
-                    {/* Hero Header */}
-                    <div className="text-center space-y-8 max-w-4xl">
-                        {/* Badge */}
-                        <div className="inline-flex items-center justify-center space-x-3 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-full px-6 py-3 border border-blue-500/30 backdrop-blur-sm hover:from-blue-500/30 hover:to-cyan-500/30 transition-all duration-300">
-                            <Star className="h-5 w-5 text-blue-400 animate-spin-slow" />
-                            <span className="text-blue-400 text-sm font-semibold tracking-wide uppercase">
-                                Next-Gen AI Development
-                            </span>
-                            <Zap className="h-5 w-5 text-cyan-400" />
-                        </div>
-
-                        {/* Main Title */}
-                        <h1 className="text-6xl md:text-8xl font-black leading-tight">
-                            <span className="block text-gradient animate-gradient">
-                                Build the
-                            </span>
-                            <span className="block text-gradient animate-gradient" style={{animationDelay: '0.5s'}}>
-                                Future
-                            </span>
-                        </h1>
-
-                        {/* Subtitle */}
-                        <p className="text-xl md:text-2xl text-slate-300 max-w-3xl mx-auto leading-relaxed">
-                            Transform your ideas into production-ready applications with 
-                            <span className="neon-blue font-semibold"> AI-powered </span>
-                            development tools
-                        </p>
-
-                        {/* Stats */}
-                        <div className="flex flex-wrap justify-center gap-8 mt-12">
-                            <div className="text-center">
-                                <div className="text-3xl font-bold neon-blue">10K+</div>
-                                <div className="text-sm text-slate-400">Projects Created</div>
-                            </div>
-                            <div className="text-center">
-                                <div className="text-3xl font-bold neon-turquoise">99%</div>
-                                <div className="text-sm text-slate-400">Success Rate</div>
-                            </div>
-                            <div className="text-center">
-                                <div className="text-3xl font-bold neon-cyan">5min</div>
-                                <div className="text-sm text-slate-400">Average Build</div>
-                            </div>
-                        </div>
-                    </div>
-
                     {/* Environment Selector */}
                     <div className="w-full max-w-4xl">
                         <div className="text-center mb-8">
