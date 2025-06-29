@@ -25,19 +25,6 @@ function Header() {
                         </div>
                     </div>
 
-                    {/* Center Navigation - Hidden on mobile */}
-                    <nav className="hidden md:flex items-center space-x-8">
-                        <a href="#" className="text-slate-300 hover:text-blue-400 transition-colors duration-200 text-sm font-medium">
-                            Projects
-                        </a>
-                        <a href="#" className="text-slate-300 hover:text-blue-400 transition-colors duration-200 text-sm font-medium">
-                            Templates
-                        </a>
-                        <a href="#" className="text-slate-300 hover:text-blue-400 transition-colors duration-200 text-sm font-medium">
-                            Docs
-                        </a>
-                    </nav>
-
                     {/* Right Side Controls */}
                     <div className="flex items-center space-x-4">
                         <ModelSelector />

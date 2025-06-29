@@ -83,76 +83,72 @@ function ChatView() {
     }
 
     return (
-        <div className="relative h-[85vh] flex flex-col bg-gradient-to-br from-slate-900 to-slate-800">
-            {/* Environment Header */}
-            <div className="bg-slate-800/50 border-b border-slate-700/50 backdrop-blur-xl px-6 py-4">
+        <div className="relative h-full flex flex-col bg-gradient-to-br from-slate-900 to-slate-800">
+            {/* Minimalist Environment Header */}
+            <div className="bg-slate-800/30 border-b border-slate-700/30 backdrop-blur-xl px-4 py-3">
                 <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <div className={`flex items-center gap-3 px-4 py-2 rounded-full border ${
-                            environment === 'react' 
-                                ? 'bg-blue-500/10 text-blue-400 border-blue-500/30' 
-                                : 'bg-orange-500/10 text-orange-400 border-orange-500/30'
-                        }`}>
-                            <div className="w-2 h-2 rounded-full bg-current animate-pulse"></div>
-                            <span className="font-medium">
-                                {environment === 'react' ? 'React Environment' : 'HTML Environment'}
-                            </span>
-                        </div>
+                    <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border ${
+                        environment === 'react' 
+                            ? 'bg-blue-500/10 text-blue-400 border-blue-500/30' 
+                            : 'bg-orange-500/10 text-orange-400 border-orange-500/30'
+                    }`}>
+                        <div className="w-1.5 h-1.5 rounded-full bg-current animate-pulse"></div>
+                        <span>{environment === 'react' ? 'React' : 'HTML'}</span>
                     </div>
                     
-                    <div className="flex items-center gap-2 text-slate-400 text-sm">
-                        <Sparkles className="h-4 w-4" />
-                        <span>AI Assistant Active</span>
+                    <div className="flex items-center gap-1.5 text-slate-400 text-xs">
+                        <Sparkles className="h-3 w-3" />
+                        <span className="hidden sm:inline">AI Active</span>
                     </div>
                 </div>
             </div>
 
-            {/* Chat Messages */}
-            <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
-                <div className="max-w-4xl mx-auto space-y-6">
+            {/* Chat Messages - Optimized for all resolutions */}
+            <div className="flex-1 overflow-y-auto custom-scrollbar p-3 sm:p-4 lg:p-6">
+                <div className="max-w-full space-y-4 sm:space-y-6">
                     {Array.isArray(messages) && messages?.map((msg, index) => (
                         <div
                             key={index}
-                            className={`flex gap-4 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                            className={`flex gap-2 sm:gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                         >
-                            {/* Avatar */}
+                            {/* AI Avatar */}
                             {msg.role === 'ai' && (
                                 <div className="flex-shrink-0">
-                                    <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center">
-                                        <Bot className="h-5 w-5 text-white" />
+                                    <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
+                                        <Bot className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
                                     </div>
                                 </div>
                             )}
                             
                             {/* Message Content */}
-                            <div className={`max-w-3xl ${msg.role === 'user' ? 'order-first' : ''}`}>
-                                <div className={`p-6 rounded-2xl shadow-lg ${
+                            <div className={`max-w-[85%] sm:max-w-[80%] lg:max-w-3xl ${msg.role === 'user' ? 'order-first' : ''}`}>
+                                <div className={`p-3 sm:p-4 lg:p-5 rounded-xl sm:rounded-2xl shadow-lg ${
                                     msg.role === 'user' 
                                         ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white' 
                                         : 'glass-morphism text-slate-100'
                                 }`}>
                                     {msg.role === 'ai' ? (
-                                        <ReactMarkdown className="prose prose-invert max-w-none prose-pre:bg-slate-800 prose-pre:border prose-pre:border-slate-600">
+                                        <ReactMarkdown className="prose prose-invert max-w-none prose-sm sm:prose-base prose-pre:bg-slate-800 prose-pre:border prose-pre:border-slate-600 prose-pre:text-xs sm:prose-pre:text-sm">
                                             {msg.content}
                                         </ReactMarkdown>
                                     ) : (
-                                        <p className="text-white">{msg.content}</p>
+                                        <p className="text-white text-sm sm:text-base">{msg.content}</p>
                                     )}
                                 </div>
                                 
-                                {/* Timestamp */}
-                                <div className={`text-xs text-slate-400 mt-2 ${
+                                {/* Minimalist Timestamp */}
+                                <div className={`text-xs text-slate-500 mt-1 ${
                                     msg.role === 'user' ? 'text-right' : 'text-left'
                                 }`}>
-                                    {msg.role === 'user' ? 'You' : 'AI Assistant'} • Just now
+                                    {msg.role === 'user' ? 'You' : 'AI'} • now
                                 </div>
                             </div>
                             
                             {/* User Avatar */}
                             {msg.role === 'user' && (
                                 <div className="flex-shrink-0">
-                                    <div className="w-10 h-10 bg-gradient-to-r from-slate-600 to-slate-700 rounded-xl flex items-center justify-center">
-                                        <User className="h-5 w-5 text-white" />
+                                    <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-r from-slate-600 to-slate-700 rounded-lg flex items-center justify-center">
+                                        <User className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
                                     </div>
                                 </div>
                             )}
@@ -161,21 +157,21 @@ function ChatView() {
                     
                     {/* Loading Message */}
                     {loading && (
-                        <div className="flex gap-4 justify-start">
+                        <div className="flex gap-2 sm:gap-3 justify-start">
                             <div className="flex-shrink-0">
-                                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center">
-                                    <Bot className="h-5 w-5 text-white" />
+                                <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
+                                    <Bot className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
                                 </div>
                             </div>
-                            <div className="glass-morphism p-6 rounded-2xl shadow-lg">
-                                <div className="flex items-center gap-3 text-slate-300">
-                                    <Loader2Icon className="animate-spin h-5 w-5 text-blue-400" />
+                            <div className="glass-morphism p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg">
+                                <div className="flex items-center gap-2 text-slate-300">
+                                    <Loader2Icon className="animate-spin h-4 w-4 text-blue-400" />
                                     <div className="flex gap-1">
-                                        <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div>
-                                        <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                                        <div className="w-2 h-2 bg-teal-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                                        <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce"></div>
+                                        <div className="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                                        <div className="w-1.5 h-1.5 bg-teal-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
                                     </div>
-                                    <span className="font-medium">AI is thinking...</span>
+                                    <span className="text-sm font-medium">Thinking...</span>
                                 </div>
                             </div>
                         </div>
@@ -183,49 +179,48 @@ function ChatView() {
                 </div>
             </div>
 
-            {/* Input Section */}
-            <div className="border-t border-slate-700/50 bg-slate-800/30 backdrop-blur-xl p-6">
-                <div className="max-w-4xl mx-auto">
-                    <div className="relative group">
-                        {/* Glow Effect */}
-                        <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl blur opacity-20 group-hover:opacity-30 transition duration-300"></div>
-                        
-                        {/* Input Container */}
-                        <div className="relative glass-morphism rounded-2xl p-4">
-                            <div className="flex gap-4">
-                                <textarea
-                                    placeholder={`Ask about your ${environment} project...`}
-                                    value={userInput}
-                                    onChange={(event) => setUserInput(event.target.value)}
-                                    className="flex-1 bg-slate-800/50 border-2 border-slate-600/50 rounded-xl p-4 text-white placeholder-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all duration-300 resize-none h-20"
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Enter' && !e.shiftKey) {
-                                            e.preventDefault();
-                                            if (userInput?.trim()) {
-                                                onGenerate(userInput);
-                                            }
+            {/* Minimalist Input Section */}
+            <div className="border-t border-slate-700/30 bg-slate-800/20 backdrop-blur-xl p-3 sm:p-4">
+                <div className="relative group">
+                    {/* Subtle Glow Effect */}
+                    <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-xl blur opacity-0 group-hover:opacity-100 transition duration-300"></div>
+                    
+                    {/* Input Container */}
+                    <div className="relative glass-morphism rounded-xl p-3">
+                        <div className="flex gap-2 sm:gap-3">
+                            <textarea
+                                placeholder={`Ask about your ${environment} project...`}
+                                value={userInput}
+                                onChange={(event) => setUserInput(event.target.value)}
+                                className="flex-1 bg-slate-800/30 border border-slate-600/30 rounded-lg p-2 sm:p-3 text-white placeholder-slate-400 focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 outline-none transition-all duration-300 resize-none text-sm sm:text-base"
+                                rows="2"
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' && !e.shiftKey) {
+                                        e.preventDefault();
+                                        if (userInput?.trim()) {
+                                            onGenerate(userInput);
                                         }
-                                    }}
-                                />
-                                
-                                {/* Send Button */}
-                                {userInput && (
-                                    <button
-                                        onClick={() => onGenerate(userInput)}
-                                        className="btn-primary flex items-center justify-center w-16 h-16 rounded-xl"
-                                    >
-                                        <Send className="h-6 w-6" />
-                                    </button>
-                                )}
-                            </div>
+                                    }
+                                }}
+                            />
                             
-                            {/* Footer */}
-                            <div className="flex justify-between items-center mt-3 text-xs text-slate-400">
-                                <span>Press Enter to send, Shift+Enter for new line</span>
-                                <div className="flex items-center gap-2">
-                                    <Link className="h-4 w-4 hover:text-blue-400 transition-colors duration-200" />
-                                    <span>Powered by AI</span>
-                                </div>
+                            {/* Send Button */}
+                            {userInput && (
+                                <button
+                                    onClick={() => onGenerate(userInput)}
+                                    className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white p-2 sm:p-3 rounded-lg transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg"
+                                >
+                                    <Send className="h-4 w-4 sm:h-5 sm:w-5" />
+                                </button>
+                            )}
+                        </div>
+                        
+                        {/* Footer */}
+                        <div className="flex justify-between items-center mt-2 text-xs text-slate-500">
+                            <span className="hidden sm:inline">Enter to send • Shift+Enter for new line</span>
+                            <div className="flex items-center gap-1">
+                                <Link className="h-3 w-3" />
+                                <span>AI Powered</span>
                             </div>
                         </div>
                     </div>

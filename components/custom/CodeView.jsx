@@ -197,63 +197,65 @@ function CodeView() {
 
     return (
         <div className='relative bg-gradient-to-br from-slate-900 to-slate-800'>
-            {/* Header */}
-            <div className='bg-slate-800/50 border-b border-slate-700/50 backdrop-blur-xl p-4'>
+            {/* Narrower Header - Reduced padding and height */}
+            <div className='bg-slate-800/30 border-b border-slate-700/30 backdrop-blur-xl px-4 py-2'>
                 <div className='flex items-center justify-between'>
-                    <div className='flex items-center gap-6'>
-                        {/* Tab Selector */}
-                        <div className='flex items-center bg-slate-900/50 p-1 rounded-xl border border-slate-700/50'>
+                    <div className='flex items-center gap-4'>
+                        {/* Compact Tab Selector */}
+                        <div className='flex items-center bg-slate-900/40 p-0.5 rounded-lg border border-slate-700/30'>
                             {tabs.map((tab) => {
                                 const IconComponent = tab.icon;
                                 return (
                                     <button
                                         key={tab.id}
                                         onClick={() => setActiveTab(tab.id)}
-                                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-300 ${
                                             activeTab === tab.id
-                                                ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg'
+                                                ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-md'
                                                 : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
                                         }`}
                                     >
-                                        <IconComponent className="h-4 w-4" />
-                                        {tab.name}
+                                        <IconComponent className="h-3 w-3" />
+                                        <span className="hidden sm:inline">{tab.name}</span>
                                     </button>
                                 );
                             })}
                         </div>
                         
-                        {/* Environment Badge */}
-                        <div className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-medium ${
+                        {/* Compact Environment Badge */}
+                        <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-medium ${
                             environment === 'react' 
                                 ? 'bg-blue-500/10 text-blue-400 border-blue-500/30' 
                                 : 'bg-orange-500/10 text-orange-400 border-orange-500/30'
                         }`}>
-                            <div className="w-2 h-2 rounded-full bg-current animate-pulse"></div>
-                            {environment === 'react' ? 'React Environment' : 'HTML/CSS/JS Environment'}
+                            <div className="w-1.5 h-1.5 rounded-full bg-current animate-pulse"></div>
+                            <span className="hidden sm:inline">
+                                {environment === 'react' ? 'React' : 'HTML/CSS/JS'}
+                            </span>
                         </div>
 
-                        {/* File Count */}
-                        <div className="flex items-center gap-2 text-slate-400 text-sm">
-                            <FolderOpen className="h-4 w-4" />
-                            <span>{Object.keys(files).length} files</span>
+                        {/* Compact File Count */}
+                        <div className="flex items-center gap-1.5 text-slate-400 text-xs">
+                            <FolderOpen className="h-3 w-3" />
+                            <span className="hidden md:inline">{Object.keys(files).length} files</span>
                         </div>
                     </div>
                     
-                    {/* Actions */}
-                    <div className="flex items-center gap-3">
-                        {/* Status */}
-                        <div className="flex items-center gap-2 text-emerald-400 text-sm">
-                            <Zap className="h-4 w-4" />
-                            <span>Live Preview</span>
+                    {/* Compact Actions */}
+                    <div className="flex items-center gap-2">
+                        {/* Compact Status */}
+                        <div className="flex items-center gap-1.5 text-emerald-400 text-xs">
+                            <Zap className="h-3 w-3" />
+                            <span className="hidden lg:inline">Live</span>
                         </div>
                         
-                        {/* Download Button */}
+                        {/* Compact Download Button */}
                         <button
                             onClick={downloadFiles}
-                            className="btn-primary flex items-center gap-2 px-4 py-2 text-sm"
+                            className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg flex items-center gap-1.5"
                         >
-                            <Download className="h-4 w-4" />
-                            <span>Export Project</span>
+                            <Download className="h-3 w-3" />
+                            <span className="hidden sm:inline">Export</span>
                         </button>
                     </div>
                 </div>
@@ -309,7 +311,7 @@ function CodeView() {
                     showLineNumbers: true,
                     showInlineErrors: true,
                     wrapContent: true,
-                    editorHeight: '80vh'
+                    editorHeight: 'calc(100vh - 8rem)' // Adjusted for narrower header
                 }}
             >
                 <div className="relative">
@@ -318,14 +320,14 @@ function CodeView() {
                             <>
                                 <SandpackFileExplorer 
                                     style={{ 
-                                        height: '80vh',
+                                        height: 'calc(100vh - 8rem)', // Adjusted for narrower header
                                         backgroundColor: '#1e293b',
                                         borderRight: '1px solid #334155'
                                     }} 
                                 />
                                 <SandpackCodeEditor 
                                     style={{ 
-                                        height: '80vh',
+                                        height: 'calc(100vh - 8rem)', // Adjusted for narrower header
                                         backgroundColor: '#1e293b'
                                     }}
                                     showTabs
@@ -337,7 +339,7 @@ function CodeView() {
                         ) : (
                             <SandpackPreview 
                                 style={{ 
-                                    height: '80vh',
+                                    height: 'calc(100vh - 8rem)', // Adjusted for narrower header
                                     backgroundColor: '#1e293b'
                                 }} 
                                 showNavigator={true}
