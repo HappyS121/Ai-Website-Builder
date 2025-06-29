@@ -2,19 +2,6 @@ import { NextResponse } from "next/server";
 import { GenAiCode, openRouterCodeSessions } from '@/configs/AiModel';
 import Prompt from '@/data/Prompt';
 
-function sanitizeJsonString(jsonString) {
-    // Fix common JSON escaping issues
-    return jsonString
-        // Fix unescaped backslashes (but preserve already properly escaped ones)
-        .replace(/\\(?!["\\/bfnrt]|u[0-9a-fA-F]{4})/g, '\\\\')
-        // Fix unescaped quotes within strings
-        .replace(/(?<!\\)"/g, '\\"')
-        // Fix the quotes we just over-escaped at the beginning and end of strings
-        .replace(/^\\"|"$/g, '"')
-        // Fix quotes around property names and string values
-        .replace(/\\?"([^"\\]*(?:\\.[^"\\]*)*)"\\?/g, '"$1"');
-}
-
 export async function POST(req) {
     const { prompt, model = 'gemini', environment = 'react' } = await req.json();
     
@@ -49,29 +36,45 @@ export async function POST(req) {
 
         const resp = result.response.text();
         
-        // Try to parse JSON response
+        // Try to parse JSON response with improved logic
         let parsedResponse;
-        try {
-            // Sanitize the response before parsing
-            const sanitizedResp = sanitizeJsonString(resp);
-            parsedResponse = JSON.parse(sanitizedResp);
-        } catch (parseError) {
-            // If parsing fails, try to extract JSON from the response
-            const jsonMatch = resp.match(/```json\n([\s\S]*?)\n```/);
-            if (jsonMatch) {
-                // Sanitize the extracted JSON before parsing
-                const sanitizedJson = sanitizeJsonString(jsonMatch[1]);
-                parsedResponse = JSON.parse(sanitizedJson);
-            } else {
-                throw new Error('Invalid JSON response from AI model');
+        
+        // First, try to extract JSON from markdown code block
+        const jsonMatch = resp.match(/```json\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) {
+            try {
+                parsedResponse = JSON.parse(jsonMatch[1].trim());
+            } catch (parseError) {
+                console.warn('Failed to parse JSON from markdown block:', parseError.message);
+                // Fall through to try parsing the entire response
+            }
+        }
+        
+        // If no markdown block found or parsing failed, try parsing the entire response
+        if (!parsedResponse) {
+            try {
+                parsedResponse = JSON.parse(resp.trim());
+            } catch (parseError) {
+                console.error('Failed to parse AI response as JSON:', parseError.message);
+                console.error('Raw response:', resp);
+                throw new Error('Invalid JSON response from AI model. The AI model returned malformed JSON.');
             }
         }
         
         return NextResponse.json(parsedResponse);
     } catch (e) {
         console.error('Code Generation Error:', e);
+        
+        // Provide more specific error messages
+        let errorMessage = 'An error occurred while generating code';
+        if (e.message.includes('rate-limited') || e.message.includes('429')) {
+            errorMessage = 'The AI model is temporarily rate-limited. Please try again in a few moments or select a different model.';
+        } else if (e.message.includes('Invalid JSON')) {
+            errorMessage = e.message;
+        }
+        
         return NextResponse.json({ 
-            error: e.message || 'An error occurred while generating code' 
+            error: errorMessage
         }, { status: 500 });
     }
 }

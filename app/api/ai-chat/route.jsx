@@ -34,8 +34,17 @@ export async function POST(req) {
         return NextResponse.json({ result: AIResp });
     } catch (e) {
         console.error('AI Chat Error:', e);
+        
+        // Provide more specific error messages for rate limiting
+        let errorMessage = 'An error occurred while processing your request';
+        if (e.message.includes('rate-limited') || e.message.includes('429')) {
+            errorMessage = 'The selected AI model is temporarily rate-limited by the provider. Please try again in a few moments or select a different model from the dropdown menu.';
+        } else if (e.message.includes('OpenRouter API error')) {
+            errorMessage = 'There was an issue with the AI service. Please try selecting a different model or try again later.';
+        }
+        
         return NextResponse.json({ 
-            error: e.message || 'An error occurred while processing your request' 
+            error: errorMessage
         }, { status: 500 });
     }
 }
