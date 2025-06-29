@@ -4,6 +4,7 @@ import { ThemeProvider as NextThemesProvider } from 'next-themes';
 import Header from '@/components/custom/Header';
 import { MessagesContext } from '@/context/MessagesContext';
 import { ModelProvider } from '@/context/ModelContext';
+import { EnvironmentProvider } from '@/context/EnvironmentContext';
 
 function Provider({children}) {
   const [messages,setMessages]=useState();
@@ -20,17 +21,19 @@ function Provider({children}) {
   return (
     <div>
       <ModelProvider>
-        <MessagesContext.Provider value={{messages,setMessages}}>
-          <NextThemesProvider
-              attribute="class"
-              defaultTheme="dark"
-              enableSystem 
-              disableTransitionOnChange
-              >
-                <Header />
-              {children}
-          </NextThemesProvider>
-        </MessagesContext.Provider>
+        <EnvironmentProvider>
+          <MessagesContext.Provider value={{messages,setMessages}}>
+            <NextThemesProvider
+                attribute="class"
+                defaultTheme="dark"
+                enableSystem 
+                disableTransitionOnChange
+                >
+                  <Header />
+                {children}
+            </NextThemesProvider>
+          </MessagesContext.Provider>
+        </EnvironmentProvider>
       </ModelProvider>
     </div>
   );

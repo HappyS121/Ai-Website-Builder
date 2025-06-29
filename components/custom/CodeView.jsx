@@ -11,6 +11,7 @@ import {
 import Lookup from '@/data/Lookup';
 import { MessagesContext } from '@/context/MessagesContext';
 import { useModel } from '@/context/ModelContext';
+import { useEnvironment } from '@/context/EnvironmentContext';
 import axios from 'axios';
 import Prompt from '@/data/Prompt';
 import { useEffect } from 'react';
@@ -26,8 +27,10 @@ function CodeView() {
     const { id } = useParams();
     const [activeTab, setActiveTab] = useState('code');
     const [files,setFiles]=useState(Lookup?.DEFAULT_FILE);
+    const [environment, setEnvironment] = useState('react');
     const {messages,setMessages}=useContext(MessagesContext);
     const { selectedModel } = useModel();
+    const { selectedEnvironment } = useEnvironment();
     const UpdateFiles=useMutation(api.workspace.UpdateFiles);
     const convex=useConvex();
     const [loading,setLoading]=useState(false);
@@ -40,9 +43,17 @@ function CodeView() {
         const result=await convex.query(api.workspace.GetWorkspace,{
             workspaceId:id
         });
+        
+        // Set environment from workspace data
+        const workspaceEnvironment = result?.environment || 'react';
+        setEnvironment(workspaceEnvironment);
+        
+        // Use appropriate default files based on environment
+        const defaultFiles = workspaceEnvironment === 'html' ? Lookup.HTML_DEFAULT_FILE : Lookup.DEFAULT_FILE;
+        
         // Preprocess and validate files before merging
         const processedFiles = preprocessFiles(result?.fileData || {});
-        const mergedFiles = {...Lookup.DEFAULT_FILE, ...processedFiles};
+        const mergedFiles = {...defaultFiles, ...processedFiles};
         setFiles(mergedFiles);
     }
 
@@ -80,12 +91,14 @@ function CodeView() {
         try {
             const result=await axios.post('/api/gen-ai-code',{
                 prompt:PROMPT,
-                model: selectedModel
+                model: selectedModel,
+                environment: environment
             });
             
             // Preprocess AI-generated files
             const processedAiFiles = preprocessFiles(result.data?.files || {});
-            const mergedFiles = {...Lookup.DEFAULT_FILE, ...processedAiFiles};
+            const defaultFiles = environment === 'html' ? Lookup.HTML_DEFAULT_FILE : Lookup.DEFAULT_FILE;
+            const mergedFiles = {...defaultFiles, ...processedAiFiles};
             setFiles(mergedFiles);
 
             await UpdateFiles({
@@ -126,19 +139,21 @@ function CodeView() {
                 }
             });
 
-            // Add package.json with dependencies
-            const packageJson = {
-                name: "generated-project",
-                version: "1.0.0",
-                private: true,
-                dependencies: Lookup.DEPENDANCY,
-                scripts: {
-                    "dev": "vite",
-                    "build": "vite build",
-                    "preview": "vite preview"
-                }
-            };
-            zip.file("package.json", JSON.stringify(packageJson, null, 2));
+            // Add package.json with dependencies only for React projects
+            if (environment === 'react') {
+                const packageJson = {
+                    name: "generated-project",
+                    version: "1.0.0",
+                    private: true,
+                    dependencies: Lookup.DEPENDANCY,
+                    scripts: {
+                        "dev": "vite",
+                        "build": "vite build",
+                        "preview": "vite preview"
+                    }
+                };
+                zip.file("package.json", JSON.stringify(packageJson, null, 2));
+            }
 
             // Generate the zip file
             const blob = await zip.generateAsync({ type: "blob" });
@@ -147,7 +162,7 @@ function CodeView() {
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'project-files.zip';
+            a.download = `${environment}-project-files.zip`;
             document.body.appendChild(a);
             a.click();
             window.URL.revokeObjectURL(url);
@@ -157,21 +172,34 @@ function CodeView() {
         }
     };
 
+    // Determine if we should use Sandpack or simple preview
+    const isHtmlProject = environment === 'html';
+
     return (
         <div className='relative'>
             <div className='bg-[#181818] w-full p-2 border'>
                 <div className='flex items-center justify-between'>
-                    <div className='flex items-center flex-wrap shrink-0 bg-black p-1 justify-center
-                    w-[140px] gap-3 rounded-full'>
-                        <h2 onClick={() => setActiveTab('code')}
-                            className={`text-sm cursor-pointer 
-                        ${activeTab == 'code' && 'text-blue-500 bg-blue-500 bg-opacity-25 p-1 px-2 rounded-full'}`}>
-                            Code</h2>
+                    <div className='flex items-center gap-4'>
+                        <div className='flex items-center flex-wrap shrink-0 bg-black p-1 justify-center
+                        w-[140px] gap-3 rounded-full'>
+                            <h2 onClick={() => setActiveTab('code')}
+                                className={`text-sm cursor-pointer 
+                            ${activeTab == 'code' && 'text-blue-500 bg-blue-500 bg-opacity-25 p-1 px-2 rounded-full'}`}>
+                                Code</h2>
 
-                        <h2 onClick={() => setActiveTab('preview')}
-                            className={`text-sm cursor-pointer 
-                        ${activeTab == 'preview' && 'text-blue-500 bg-blue-500 bg-opacity-25 p-1 px-2 rounded-full'}`}>
-                            Preview</h2>
+                            <h2 onClick={() => setActiveTab('preview')}
+                                className={`text-sm cursor-pointer 
+                            ${activeTab == 'preview' && 'text-blue-500 bg-blue-500 bg-opacity-25 p-1 px-2 rounded-full'}`}>
+                                Preview</h2>
+                        </div>
+                        
+                        {/* Environment indicator */}
+                        <div className="flex items-center gap-2 bg-gray-700/50 px-3 py-1 rounded-full">
+                            <span className="text-xs text-gray-400">Environment:</span>
+                            <span className="text-xs font-medium text-blue-400">
+                                {environment === 'html' ? 'HTML/CSS/JS' : 'React + Vite'}
+                            </span>
+                        </div>
                     </div>
                     
                     {/* Download Button */}
@@ -184,45 +212,91 @@ function CodeView() {
                     </button>
                 </div>
             </div>
-            <SandpackProvider 
-            files={files}
-            template="react" 
-            theme={'dark'}
-            customSetup={{
-                dependencies: {
-                    ...Lookup.DEPENDANCY
-                },
-                entry: '/index.js'
-            }}
-            options={{
-                externalResources: ['https://cdn.tailwindcss.com'],
-                bundlerTimeoutSecs: 120,
-                recompileMode: "immediate",
-                recompileDelay: 300
-            }}
-            >
+
+            {isHtmlProject ? (
+                // Simple HTML preview for HTML projects
                 <div className="relative">
-                    <SandpackLayout>
-                        {activeTab=='code'?<>
-                            <SandpackFileExplorer style={{ height: '80vh' }} />
-                            <SandpackCodeEditor 
-                            style={{ height: '80vh' }}
-                            showTabs
-                            showLineNumbers
-                            showInlineErrors
-                            wrapContent />
-                        </>:
-                        <>
-                            <SandpackPreview 
-                                style={{ height: '80vh' }} 
-                                showNavigator={true}
-                                showOpenInCodeSandbox={false}
-                                showRefreshButton={true}
+                    {activeTab === 'code' ? (
+                        <div className="bg-gray-900 h-[80vh] overflow-auto">
+                            <div className="flex">
+                                <div className="w-1/4 bg-gray-800 border-r border-gray-700">
+                                    <div className="p-4">
+                                        <h3 className="text-white font-medium mb-4">Files</h3>
+                                        {Object.keys(files).map((filename) => (
+                                            <div key={filename} className="text-gray-300 text-sm py-1 px-2 hover:bg-gray-700 rounded cursor-pointer">
+                                                {filename}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div className="flex-1">
+                                    <div className="p-4">
+                                        <pre className="text-gray-300 text-sm overflow-auto">
+                                            {Object.entries(files).map(([filename, content]) => (
+                                                <div key={filename} className="mb-8">
+                                                    <div className="text-blue-400 font-medium mb-2">{filename}</div>
+                                                    <code className="block bg-gray-800 p-4 rounded">
+                                                        {typeof content === 'string' ? content : content.code}
+                                                    </code>
+                                                </div>
+                                            ))}
+                                        </pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="h-[80vh]">
+                            <iframe
+                                srcDoc={files['/index.html']?.code || files['/index.html']}
+                                className="w-full h-full border-0"
+                                title="HTML Preview"
                             />
-                        </>}
-                    </SandpackLayout>
+                        </div>
+                    )}
                 </div>
-            </SandpackProvider>
+            ) : (
+                // Sandpack for React projects
+                <SandpackProvider 
+                files={files}
+                template="react" 
+                theme={'dark'}
+                customSetup={{
+                    dependencies: {
+                        ...Lookup.DEPENDANCY
+                    },
+                    entry: '/index.js'
+                }}
+                options={{
+                    externalResources: ['https://cdn.tailwindcss.com'],
+                    bundlerTimeoutSecs: 120,
+                    recompileMode: "immediate",
+                    recompileDelay: 300
+                }}
+                >
+                    <div className="relative">
+                        <SandpackLayout>
+                            {activeTab=='code'?<>
+                                <SandpackFileExplorer style={{ height: '80vh' }} />
+                                <SandpackCodeEditor 
+                                style={{ height: '80vh' }}
+                                showTabs
+                                showLineNumbers
+                                showInlineErrors
+                                wrapContent />
+                            </>:
+                            <>
+                                <SandpackPreview 
+                                    style={{ height: '80vh' }} 
+                                    showNavigator={true}
+                                    showOpenInCodeSandbox={false}
+                                    showRefreshButton={true}
+                                />
+                            </>}
+                        </SandpackLayout>
+                    </div>
+                </SandpackProvider>
+            )}
 
             {loading&&<div className='p-10 bg-gray-900 opacity-80 absolute top-0 
             rounded-lg w-full h-full flex items-center justify-center'>

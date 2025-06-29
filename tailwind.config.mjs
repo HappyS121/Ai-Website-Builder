@@ -48,7 +48,13 @@ export default {
   				'3': 'hsl(var(--chart-3))',
   				'4': 'hsl(var(--chart-4))',
   				'5': 'hsl(var(--chart-5))'
-  			}
+  			},
+            'electric-blue': {
+                400: '#60a5fa',
+                500: '#3b82f6',
+                600: '#2563eb'
+            },
+            'neon-cyan': '#06b6d4'
   		},
   		borderRadius: {
   			lg: 'var(--radius)',

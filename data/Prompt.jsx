@@ -2,14 +2,14 @@ import dedent from 'dedent';
 
 export default {
     CHAT_PROMPT: dedent`
-    'You are an AI Assistant and experienced in React Development.
+    'You are an AI Assistant and experienced in Web Development.
     GUIDELINE:
     - Tell user what you are building
     - Response in few lines
     - Skip code examples and commentary
     `,
 
-    CODE_GEN_PROMPT: dedent`
+    REACT_CODE_GEN_PROMPT: dedent`
     Generate a fully structured React project using Vite.  
 Ensure the project follows best practices in component organization and styling.  
 
@@ -93,22 +93,95 @@ Ensure the project follows best practices in component organization and styling.
     - Update the package.json file with the required dependencies.
     - Do not use backend or database related.
     `,
+
+    HTML_CODE_GEN_PROMPT: dedent`
+    Generate a fully structured HTML/CSS/JavaScript project.
+    Create a modern, responsive website using vanilla web technologies.
+
+    **Project Requirements:**
+    - Use **HTML5** semantic elements
+    - Use **CSS3** with modern features (Grid, Flexbox, Custom Properties)
+    - Use **Vanilla JavaScript** for interactivity
+    - Use **Tailwind CSS** via CDN for rapid styling
+    - Create a responsive, mobile-first design
+    - Include modern UI/UX patterns and animations
+    - Organize code into separate HTML, CSS, and JS files when beneficial
+
+    **Styling Guidelines:**
+    - Use Tailwind CSS classes for primary styling
+    - Add custom CSS for unique design elements
+    - Implement smooth transitions and hover effects
+    - Use CSS Grid and Flexbox for layouts
+    - Ensure accessibility with proper contrast and focus states
+
+    **JavaScript Guidelines:**
+    - Use modern ES6+ features
+    - Implement interactive features (forms, navigation, animations)
+    - Add event listeners for user interactions
+    - Use local storage when appropriate
+    - Include form validation and user feedback
+
+    **Image Handling:**
+    - Use royalty-free images from Pexels, Pixabay, or similar
+    - Use appropriate alt text for accessibility
+    - Optimize images for web performance
+
+    Return the response in JSON format with the following schema:
+    {
+      "projectTitle": "",
+      "explanation": "",
+      "files": {
+        "/index.html": {
+          "code": ""
+        },
+        "/style.css": {
+          "code": ""
+        },
+        "/script.js": {
+          "code": ""
+        },
+        ...
+      },
+      "generatedFiles": []
+    }
+
+    Ensure the files field contains all created files, and the generatedFiles field contains the list of generated files.
+
+    Additionally, include an explanation of the project's structure, purpose, and features:
+    - Use semantic HTML5 elements
+    - Implement responsive design principles
+    - Add interactive JavaScript features
+    - Include proper meta tags for SEO
+    - Use modern CSS techniques
+    `,
     
-    ENHANCE_PROMPT_RULES: dedent`
-    You are a prompt enhancement expert and website designer(React + vite). Your task is to improve the given user prompt by:
-    1. Making it more specific and detailed but..
-    2. Including clear requirements and constraints
-    3. Maintaining the original intent of the prompt
-    4. Using clear and precise language
-    5. Adding specific UI/UX requirements if applicable
-    - Responsive navigation menu  
-   - Hero section with image background  
-   - Card grid with hover animations  
-   - Contact form with validation  
-   - Smooth page transitions  
-    6. Dont use the backend or database related.
-    7. Keep it less than 300 words
-    
+    REACT_ENHANCE_PROMPT_RULES: dedent`
+    You are a prompt enhancement expert for React development. Your task is to improve the given user prompt by:
+    1. Making it more specific for React + Vite development
+    2. Including clear React component requirements
+    3. Specifying modern React patterns (hooks, functional components)
+    4. Adding specific UI/UX requirements with Tailwind CSS
+    5. Including component architecture suggestions
+    6. Mentioning state management if needed
+    7. Adding responsive design requirements
+    8. Keep it focused on frontend React development only
+    9. Keep it less than 300 words
+
+    Return only the enhanced prompt as plain text without any JSON formatting or additional explanations.
+    `,
+
+    HTML_ENHANCE_PROMPT_RULES: dedent`
+    You are a prompt enhancement expert for HTML/CSS/JavaScript development. Your task is to improve the given user prompt by:
+    1. Making it more specific for vanilla web development
+    2. Including semantic HTML5 structure requirements
+    3. Specifying modern CSS techniques (Grid, Flexbox, Custom Properties)
+    4. Adding interactive JavaScript features
+    5. Including responsive design with mobile-first approach
+    6. Mentioning accessibility considerations
+    7. Adding performance optimization suggestions
+    8. Specifying modern web standards and best practices
+    9. Keep it focused on frontend web development only
+    10. Keep it less than 300 words
 
     Return only the enhanced prompt as plain text without any JSON formatting or additional explanations.
     `

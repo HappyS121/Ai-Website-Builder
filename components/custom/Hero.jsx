@@ -1,16 +1,19 @@
 "use client"
 import Lookup from '@/data/Lookup';
 import { MessagesContext } from '@/context/MessagesContext';
+import { useEnvironment } from '@/context/EnvironmentContext';
 import { ArrowRight, Link, Sparkles, Send, Wand2, Loader2 } from 'lucide-react';
 import React, { useContext, useState } from 'react';
 import { useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { useRouter } from 'next/navigation';
+import EnvironmentSelector from './EnvironmentSelector';
 
 function Hero() {
     const [userInput, setUserInput] = useState('');
     const [isEnhancing, setIsEnhancing] = useState(false);
     const { messages, setMessages } = useContext(MessagesContext);
+    const { selectedEnvironment } = useEnvironment();
     const CreateWorkspace = useMutation(api.workspace.CreateWorkspace);
     const router = useRouter();
 
@@ -21,7 +24,8 @@ function Hero() {
         }
         setMessages(msg);
         const workspaceID = await CreateWorkspace({
-            messages: [msg]
+            messages: [msg],
+            environment: selectedEnvironment
         });
         router.push('/workspace/' + workspaceID);
     }
@@ -36,7 +40,10 @@ function Hero() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ prompt: userInput }),
+                body: JSON.stringify({ 
+                    prompt: userInput,
+                    environment: selectedEnvironment
+                }),
             });
 
             const data = await response.json();
@@ -52,6 +59,14 @@ function Hero() {
 
     const onSuggestionClick = (suggestion) => {
         setUserInput(suggestion);
+    };
+
+    // Get environment-specific suggestions
+    const getSuggestions = () => {
+        if (selectedEnvironment === 'html') {
+            return Lookup.HTML_SUGGESTIONS;
+        }
+        return Lookup.REACT_SUGGESTIONS;
     };
 
     return (
@@ -75,8 +90,19 @@ function Hero() {
                             Code the <br className="md:hidden" />Impossible
                         </h1>
                         <p className="text-xl text-neon-cyan max-w-3xl mx-auto font-mono tracking-tight">
-                            Transform your wildest ideas into production-ready code with Ai-powered assistance
+                            Transform your wildest ideas into production-ready code with AI-powered assistance
                         </p>
+                    </div>
+
+                    {/* Environment Selector */}
+                    <div className="w-full max-w-3xl">
+                        <div className="text-center mb-4">
+                            <h3 className="text-lg font-semibold text-electric-blue-400 mb-2">Choose Your Development Environment</h3>
+                            <p className="text-sm text-gray-400">Select the technology stack for your project</p>
+                        </div>
+                        <div className="flex justify-center">
+                            <EnvironmentSelector />
+                        </div>
                     </div>
 
                     {/* Modified Input Section */}
@@ -123,10 +149,16 @@ function Hero() {
                         </div>
                     </div>
 
-                    {/* Holographic Suggestions Grid */}
+                    {/* Environment-specific Suggestions Grid */}
                     <div className="w-full max-w-5xl">
+                        <div className="text-center mb-6">
+                            <h3 className="text-lg font-semibold text-electric-blue-400 mb-2">
+                                {selectedEnvironment === 'html' ? 'HTML Project Ideas' : 'React Project Ideas'}
+                            </h3>
+                            <p className="text-sm text-gray-400">Click on any suggestion to get started</p>
+                        </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {Lookup?.SUGGSTIONS.map((suggestion, index) => (
+                            {getSuggestions().map((suggestion, index) => (
                                 <button
                                     key={index}
                                     onClick={() => onSuggestionClick(suggestion)}
