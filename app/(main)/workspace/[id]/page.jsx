@@ -15,19 +15,19 @@ const Workspace = () => {
                 <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
             </div>
 
-            {/* Content - Optimized for mobile */}
-            <div className='relative z-10 p-2 sm:p-3 lg:p-4'>
-                <div className='grid grid-cols-1 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4 h-[calc(100vh-1rem)] sm:h-[calc(100vh-1.5rem)] lg:h-[calc(100vh-2rem)]'>
-                    {/* Chat Panel - Full width on mobile, 1/4 on desktop */}
-                    <div className='lg:col-span-1 h-[50vh] lg:h-full'>
-                        <div className="h-full glass-morphism rounded-lg lg:rounded-xl overflow-hidden shadow-2xl">
+            {/* Content */}
+            <div className='relative z-10 p-6'>
+                <div className='grid grid-cols-1 lg:grid-cols-4 gap-6 h-[calc(100vh-3rem)]'>
+                    {/* Chat Panel */}
+                    <div className='lg:col-span-1'>
+                        <div className="h-full glass-morphism rounded-2xl overflow-hidden shadow-2xl">
                             <ChatView />
                         </div>
                     </div>
                     
-                    {/* Code Panel - Full width on mobile, 3/4 on desktop */}
-                    <div className='lg:col-span-3 h-[50vh] lg:h-full'>
-                        <div className="h-full glass-morphism rounded-lg lg:rounded-xl overflow-hidden shadow-2xl">
+                    {/* Code Panel */}
+                    <div className='lg:col-span-3'>
+                        <div className="h-full glass-morphism rounded-2xl overflow-hidden shadow-2xl">
                             <CodeView />
                         </div>
                     </div>
