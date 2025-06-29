@@ -23,7 +23,7 @@ function ModelSelector() {
         <div className="relative">
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center gap-3 liquid-glass hover-lift border border-blue-500/30 rounded-2xl px-6 py-3 text-sm text-slate-300 transition-all duration-300 group"
+                className="flex items-center gap-3 bg-slate-800 hover:bg-slate-700 border border-blue-500/30 rounded-2xl px-6 py-3 text-sm text-slate-300 transition-all duration-300 group shadow-lg"
             >
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg animate-pulse-glow">
@@ -42,7 +42,7 @@ function ModelSelector() {
             </button>
 
             {isOpen && (
-                <div className="absolute top-full right-0 mt-3 w-96 liquid-glass border border-blue-500/30 rounded-3xl shadow-2xl z-50 overflow-hidden">
+                <div className="absolute top-full right-0 mt-3 w-96 bg-slate-800 border border-blue-500/30 rounded-3xl shadow-2xl z-50 overflow-hidden">
                     {/* Header */}
                     <div className="p-6 border-b border-blue-500/20 bg-gradient-to-r from-blue-500/10 to-cyan-500/10">
                         <div className="flex items-center gap-3">
@@ -61,7 +61,7 @@ function ModelSelector() {
                                 className={`w-full text-left p-4 rounded-2xl text-sm transition-all duration-300 group mb-2 ${
                                     selectedModel === model.key
                                         ? 'bg-gradient-to-r from-blue-500/20 to-cyan-500/20 text-blue-400 border border-blue-500/30 shadow-lg animate-pulse-glow'
-                                        : 'text-slate-300 hover:bg-slate-800/50 hover:text-white liquid-glass-hover'
+                                        : 'text-slate-300 hover:bg-slate-700 hover:text-white'
                                 }`}
                             >
                                 <div className="flex items-center justify-between">
@@ -108,7 +108,7 @@ function ModelSelector() {
                     </div>
 
                     {/* Footer */}
-                    <div className="p-6 border-t border-blue-500/20 liquid-glass">
+                    <div className="p-6 border-t border-blue-500/20 bg-slate-800">
                         <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
                             <Star className="h-4 w-4 animate-pulse" />
                             <span>All models support code generation</span>
