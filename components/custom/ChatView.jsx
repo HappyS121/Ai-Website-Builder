@@ -4,7 +4,7 @@ import { ArrowRight, Link, Loader2Icon, Send, Bot, User, Sparkles } from 'lucide
 import { api } from '@/convex/_generated/api';
 import { useConvex } from 'convex/react';
 import { useParams } from 'next/navigation';
-import { useContext, useEffect, useState, useRef } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useMutation } from 'convex/react';
 import Prompt from '@/data/Prompt';
 import axios from 'axios';
@@ -20,17 +20,6 @@ function ChatView() {
     const [loading, setLoading] = useState(false);
     const [environment, setEnvironment] = useState('react');
     const UpdateMessages = useMutation(api.workspace.UpdateWorkspace);
-    const messagesEndRef = useRef(null);
-    const chatContainerRef = useRef(null);
-
-    // Auto-scroll to bottom when new messages arrive
-    const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    };
-
-    useEffect(() => {
-        scrollToBottom();
-    }, [messages, loading]);
 
     useEffect(() => {
         id && GetWorkSpaceData();
@@ -94,9 +83,9 @@ function ChatView() {
     }
 
     return (
-        <div className="h-full flex flex-col bg-gradient-to-br from-slate-900 to-slate-800">
+        <div className="relative h-full flex flex-col bg-gradient-to-br from-slate-900 to-slate-800">
             {/* Minimalist Environment Header */}
-            <div className="bg-slate-800/30 border-b border-slate-700/30 backdrop-blur-xl px-4 py-3 flex-shrink-0">
+            <div className="bg-slate-800/30 border-b border-slate-700/30 backdrop-blur-xl px-4 py-3">
                 <div className="flex items-center justify-between">
                     <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border ${
                         environment === 'react' 
@@ -114,94 +103,84 @@ function ChatView() {
                 </div>
             </div>
 
-            {/* Chat Messages Container - Fixed height with proper scrolling */}
-            <div 
-                ref={chatContainerRef}
-                className="flex-1 overflow-y-auto custom-scrollbar p-3 sm:p-4 lg:p-6"
-                style={{ height: 'calc(100% - 140px)' }} // Fixed height calculation
-            >
-                <div className="max-w-full space-y-4 sm:space-y-6 min-h-full flex flex-col">
-                    {/* Messages */}
-                    <div className="flex-1">
-                        {Array.isArray(messages) && messages?.map((msg, index) => (
-                            <div
-                                key={index}
-                                className={`flex gap-2 sm:gap-3 mb-4 sm:mb-6 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                            >
-                                {/* AI Avatar */}
-                                {msg.role === 'ai' && (
-                                    <div className="flex-shrink-0">
-                                        <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
-                                            <Bot className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
-                                        </div>
-                                    </div>
-                                )}
-                                
-                                {/* Message Content */}
-                                <div className={`max-w-[85%] sm:max-w-[80%] lg:max-w-3xl ${msg.role === 'user' ? 'order-first' : ''}`}>
-                                    <div className={`p-3 sm:p-4 lg:p-5 rounded-xl sm:rounded-2xl shadow-lg ${
-                                        msg.role === 'user' 
-                                            ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white' 
-                                            : 'glass-morphism text-slate-100'
-                                    }`}>
-                                        {msg.role === 'ai' ? (
-                                            <ReactMarkdown className="prose prose-invert max-w-none prose-sm sm:prose-base prose-pre:bg-slate-800 prose-pre:border prose-pre:border-slate-600 prose-pre:text-xs sm:prose-pre:text-sm">
-                                                {msg.content}
-                                            </ReactMarkdown>
-                                        ) : (
-                                            <p className="text-white text-sm sm:text-base">{msg.content}</p>
-                                        )}
-                                    </div>
-                                    
-                                    {/* Minimalist Timestamp */}
-                                    <div className={`text-xs text-slate-500 mt-1 ${
-                                        msg.role === 'user' ? 'text-right' : 'text-left'
-                                    }`}>
-                                        {msg.role === 'user' ? 'You' : 'AI'} • now
-                                    </div>
-                                </div>
-                                
-                                {/* User Avatar */}
-                                {msg.role === 'user' && (
-                                    <div className="flex-shrink-0">
-                                        <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-r from-slate-600 to-slate-700 rounded-lg flex items-center justify-center">
-                                            <User className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        ))}
-                        
-                        {/* Loading Message */}
-                        {loading && (
-                            <div className="flex gap-2 sm:gap-3 justify-start mb-4 sm:mb-6">
+            {/* Chat Messages - Optimized for all resolutions */}
+            <div className="flex-1 overflow-y-auto custom-scrollbar p-3 sm:p-4 lg:p-6">
+                <div className="max-w-full space-y-4 sm:space-y-6">
+                    {Array.isArray(messages) && messages?.map((msg, index) => (
+                        <div
+                            key={index}
+                            className={`flex gap-2 sm:gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                        >
+                            {/* AI Avatar */}
+                            {msg.role === 'ai' && (
                                 <div className="flex-shrink-0">
                                     <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
                                         <Bot className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
                                     </div>
                                 </div>
-                                <div className="glass-morphism p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg">
-                                    <div className="flex items-center gap-2 text-slate-300">
-                                        <Loader2Icon className="animate-spin h-4 w-4 text-blue-400" />
-                                        <div className="flex gap-1">
-                                            <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce"></div>
-                                            <div className="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                                            <div className="w-1.5 h-1.5 bg-teal-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-                                        </div>
-                                        <span className="text-sm font-medium">Thinking...</span>
-                                    </div>
+                            )}
+                            
+                            {/* Message Content */}
+                            <div className={`max-w-[85%] sm:max-w-[80%] lg:max-w-3xl ${msg.role === 'user' ? 'order-first' : ''}`}>
+                                <div className={`p-3 sm:p-4 lg:p-5 rounded-xl sm:rounded-2xl shadow-lg ${
+                                    msg.role === 'user' 
+                                        ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white' 
+                                        : 'glass-morphism text-slate-100'
+                                }`}>
+                                    {msg.role === 'ai' ? (
+                                        <ReactMarkdown className="prose prose-invert max-w-none prose-sm sm:prose-base prose-pre:bg-slate-800 prose-pre:border prose-pre:border-slate-600 prose-pre:text-xs sm:prose-pre:text-sm">
+                                            {msg.content}
+                                        </ReactMarkdown>
+                                    ) : (
+                                        <p className="text-white text-sm sm:text-base">{msg.content}</p>
+                                    )}
+                                </div>
+                                
+                                {/* Minimalist Timestamp */}
+                                <div className={`text-xs text-slate-500 mt-1 ${
+                                    msg.role === 'user' ? 'text-right' : 'text-left'
+                                }`}>
+                                    {msg.role === 'user' ? 'You' : 'AI'} • now
                                 </div>
                             </div>
-                        )}
-                    </div>
+                            
+                            {/* User Avatar */}
+                            {msg.role === 'user' && (
+                                <div className="flex-shrink-0">
+                                    <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-r from-slate-600 to-slate-700 rounded-lg flex items-center justify-center">
+                                        <User className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    ))}
                     
-                    {/* Scroll anchor */}
-                    <div ref={messagesEndRef} />
+                    {/* Loading Message */}
+                    {loading && (
+                        <div className="flex gap-2 sm:gap-3 justify-start">
+                            <div className="flex-shrink-0">
+                                <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
+                                    <Bot className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
+                                </div>
+                            </div>
+                            <div className="glass-morphism p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg">
+                                <div className="flex items-center gap-2 text-slate-300">
+                                    <Loader2Icon className="animate-spin h-4 w-4 text-blue-400" />
+                                    <div className="flex gap-1">
+                                        <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce"></div>
+                                        <div className="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                                        <div className="w-1.5 h-1.5 bg-teal-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                                    </div>
+                                    <span className="text-sm font-medium">Thinking...</span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 
-            {/* Fixed Input Section */}
-            <div className="border-t border-slate-700/30 bg-slate-800/20 backdrop-blur-xl p-3 sm:p-4 flex-shrink-0">
+            {/* Minimalist Input Section */}
+            <div className="border-t border-slate-700/30 bg-slate-800/20 backdrop-blur-xl p-3 sm:p-4">
                 <div className="relative group">
                     {/* Subtle Glow Effect */}
                     <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-xl blur opacity-0 group-hover:opacity-100 transition duration-300"></div>
