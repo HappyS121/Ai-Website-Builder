@@ -234,7 +234,6 @@ function CodeView() {
                 entry: environment === 'html' ? '/index.html' : '/index.js'
             }}
             options={{
-                externalResources: ['https://cdn.tailwindcss.com'],
                 bundlerTimeoutSecs: 120,
                 recompileMode: "immediate",
                 recompileDelay: 300

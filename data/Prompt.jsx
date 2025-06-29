@@ -57,17 +57,16 @@ export default {
         - "uuid": "^11.1.0"  
         - "@mui/material": "^6.4.6"  
 
-        Return the response in JSON format with the following schema:
+        **IMPORTANT: You must respond ONLY with valid JSON in the following format:**
         {
-          "projectTitle": "",
-          "explanation": "",
+          "projectTitle": "Brief title of the project",
+          "explanation": "Detailed explanation of the project's structure, purpose, and features including placeholder image usage, lucide-react icons, package.json dependencies, and any special instructions",
           "files": {
             "/App.js": {
-              "code": ""
-            },
-            ...
+              "code": "complete file content here"
+            }
           },
-          "generatedFiles": []
+          "generatedFiles": ["list of all generated file paths"]
         }
 
         Generate a programming code structure for a React project using Vite.
@@ -77,13 +76,6 @@ export default {
         Ensure the files field contains all the created files, and the generatedFiles field contains the list of generated files.
         
         Also update the Package.json file with the needed dependencies.
-
-        Additionally, include an explanation of the project's structure, purpose, and additional instructions:
-        - For placeholder images use appropriate URLs.
-        - Add external images if needed.
-        - The lucide-react library is also available to be imported IF NECESSARY.
-        - Update the package.json file with the required dependencies.
-        - Do not use backend or database related.
         `,
 
         HTML: dedent`
@@ -118,35 +110,27 @@ export default {
         - Optimize images for web performance
         - Use appropriate alt text for accessibility
 
-        Return the response in JSON format with the following schema:
+        **IMPORTANT: You must respond ONLY with valid JSON in the following format:**
         {
-          "projectTitle": "",
-          "explanation": "",
+          "projectTitle": "Brief title of the project",
+          "explanation": "Detailed explanation of the project's structure, purpose, features, semantic HTML usage, responsive design implementation, JavaScript interactivity, external images, and performance considerations",
           "files": {
             "/index.html": {
-              "code": ""
+              "code": "complete file content here"
             },
             "/styles.css": {
-              "code": ""
+              "code": "complete file content here"
             },
             "/script.js": {
-              "code": ""
-            },
-            ...
+              "code": "complete file content here"
+            }
           },
-          "generatedFiles": []
+          "generatedFiles": ["list of all generated file paths"]
         }
 
         Generate a complete HTML/CSS/JavaScript project structure.
         Create multiple files for better organization.
         Use modern web standards and best practices.
-
-        Additionally, include an explanation of the project's structure and purpose:
-        - Use semantic HTML elements
-        - Implement responsive design
-        - Add interactive JavaScript features
-        - Use external images with proper attribution
-        - Focus on performance and accessibility
         `
     },
     
