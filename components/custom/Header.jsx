@@ -32,7 +32,7 @@ function Header() {
                             </div>
                         </div>
                         <div className="flex flex-col">
-                            <h1 className="text-xl font-black text-gradient-animated">
+                            <h1 className="text-xl font-black text-white">
                                 LanSoft Dev
                             </h1>
                             <p className="text-xs text-slate-400 hidden sm:block font-medium">
