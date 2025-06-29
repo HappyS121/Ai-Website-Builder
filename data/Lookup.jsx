@@ -1,16 +1,34 @@
 export default {
-    SUGGSTIONS: ['Create Todo App', 'Create a Budget Track App', 'Create a Login and Signup page',
-    "Develop a Task Management App",
-    "Create a Fully Responsive Blog Platform",
-    "Design a Minimalistic Note-Taking App",
-    "Develop a Customizable Landing Page",
-    "Develop a Recipe Sharing Platform",
-    "Create a Fitness Tracking App",
-    "Develop a Personal Finance Management Tool",
-    "Create a Language Learning App",
-    "Build a Virtual Event Platform",
-    "Create a Music Streaming Service"
-  ],
+    REACT_SUGGESTIONS: [
+        'Create Todo App', 
+        'Create a Budget Track App', 
+        'Create a Login and Signup page',
+        "Develop a Task Management App",
+        "Create a Fully Responsive Blog Platform",
+        "Design a Minimalistic Note-Taking App",
+        "Develop a Customizable Landing Page",
+        "Develop a Recipe Sharing Platform",
+        "Create a Fitness Tracking App",
+        "Develop a Personal Finance Management Tool",
+        "Create a Language Learning App",
+        "Build a Virtual Event Platform",
+        "Create a Music Streaming Service"
+    ],
+
+    HTML_SUGGESTIONS: [
+        'Create a Portfolio Website',
+        'Build a Restaurant Landing Page',
+        'Design a Photography Gallery',
+        'Create a Business Website',
+        'Build a Product Showcase Page',
+        'Design a Travel Blog',
+        'Create an Event Landing Page',
+        'Build a Real Estate Website',
+        'Design a Fashion Store',
+        'Create a News Website',
+        'Build a Gaming Landing Page',
+        'Design a Fitness Gym Website'
+    ],
 
     DEFAULT_FILE: {
         '/public/index.html':
@@ -58,6 +76,75 @@ export default config;
 }
 
         },
+
+    HTML_DEFAULT_FILE: {
+        '/index.html': {
+            code: `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Website</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles can go here */
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1 class="text-4xl font-bold text-center mt-10">Welcome to My Website</h1>
+        <p class="text-center mt-4 text-gray-600">This is a starter template.</p>
+    </div>
+    
+    <script>
+        // JavaScript code goes here
+        console.log('Website loaded successfully!');
+    </script>
+</body>
+</html>`
+        },
+        '/style.css': {
+            code: `/* Custom CSS styles */
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+/* Add your custom styles here */
+.custom-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Responsive utilities */
+@media (max-width: 768px) {
+    .mobile-hidden {
+        display: none;
+    }
+}`
+        },
+        '/script.js': {
+            code: `// Main JavaScript functionality
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM fully loaded');
+    
+    // Add your JavaScript code here
+    initializeApp();
+});
+
+function initializeApp() {
+    // Initialize your application
+    console.log('App initialized');
+}
+
+// Utility functions
+function $(selector) {
+    return document.querySelector(selector);
+}
+
+function $$(selector) {
+    return document.querySelectorAll(selector);
+}`
+        }
+    },
 
     DEPENDANCY: {
             "@google/generative-ai": "^0.21.0",

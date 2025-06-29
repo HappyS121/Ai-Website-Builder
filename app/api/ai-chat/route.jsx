@@ -1,28 +1,32 @@
 import { chatSession, openRouterChatSessions } from "@/configs/AiModel";
+import Prompt from "@/data/Prompt";
 import { NextResponse } from "next/server";
 
 export async function POST(req) {
-    const { prompt, model = 'gemini' } = await req.json();
+    const { prompt, model = 'gemini', environment = 'react' } = await req.json();
 
     try {
+        // Use the same chat prompt for both environments, but could be customized if needed
+        const chatPrompt = JSON.stringify([{ role: 'user', content: prompt }]) + Prompt.CHAT_PROMPT;
+        
         let result;
         
         switch (model) {
             case 'deepseek-chat':
-                result = await openRouterChatSessions.deepseekChat.sendMessage(prompt);
+                result = await openRouterChatSessions.deepseekChat.sendMessage(chatPrompt);
                 break;
             case 'deepseek-r1':
-                result = await openRouterChatSessions.deepseekR1.sendMessage(prompt);
+                result = await openRouterChatSessions.deepseekR1.sendMessage(chatPrompt);
                 break;
             case 'gemini-openrouter':
-                result = await openRouterChatSessions.geminiFlash.sendMessage(prompt);
+                result = await openRouterChatSessions.geminiFlash.sendMessage(chatPrompt);
                 break;
             case 'qwen':
-                result = await openRouterChatSessions.qwen.sendMessage(prompt);
+                result = await openRouterChatSessions.qwen.sendMessage(chatPrompt);
                 break;
             case 'gemini':
             default:
-                result = await chatSession.sendMessage(prompt);
+                result = await chatSession.sendMessage(chatPrompt);
                 break;
         }
 
