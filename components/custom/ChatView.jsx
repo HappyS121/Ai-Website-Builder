@@ -18,6 +18,7 @@ function ChatView() {
     const { selectedModel } = useModel();
     const [userInput, setUserInput] = useState();
     const [loading, setLoading] = useState(false);
+    const [environment, setEnvironment] = useState('react');
     const UpdateMessages = useMutation(api.workspace.UpdateWorkspace);
 
     useEffect(() => {
@@ -29,6 +30,7 @@ function ChatView() {
             workspaceId: id
         });
         setMessages(result?.messages);
+        setEnvironment(result?.environment || 'react');
         console.log(result);
     }
 
@@ -43,12 +45,13 @@ function ChatView() {
 
     const GetAiResponse = async () => {
         setLoading(true);
-        const PROMPT = JSON.stringify(messages) + Prompt.CHAT_PROMPT;
+        const PROMPT = JSON.stringify(messages);
         
         try {
             const result = await axios.post('/api/ai-chat', {
                 prompt: PROMPT,
-                model: selectedModel
+                model: selectedModel,
+                environment: environment
             });
 
             const aiResp = {
@@ -81,6 +84,19 @@ function ChatView() {
 
     return (
         <div className="relative h-[85vh] flex flex-col bg-gray-900">
+            {/* Environment Indicator */}
+            <div className="bg-gray-800/50 border-b border-gray-700 px-4 py-2">
+                <div className="flex items-center gap-2">
+                    <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        environment === 'react' 
+                            ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' 
+                            : 'bg-orange-500/20 text-orange-400 border border-orange-500/30'
+                    }`}>
+                        {environment === 'react' ? 'React Environment' : 'HTML Environment'}
+                    </div>
+                </div>
+            </div>
+
             {/* Chat Messages */}
             <div className="flex-1 overflow-y-auto scrollbar-hide p-4">
                 <div className="max-w-4xl mx-auto space-y-4">
@@ -125,7 +141,7 @@ function ChatView() {
                     <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-4">
                         <div className="flex gap-3">
                             <textarea
-                                placeholder="Type your message here..."
+                                placeholder={`Type your ${environment} question here...`}
                                 value={userInput}
                                 onChange={(event) => setUserInput(event.target.value)}
                                 className="w-full bg-gray-900/50 border border-gray-700 rounded-xl p-4 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-200 resize-none h-32"

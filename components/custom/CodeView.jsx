@@ -25,7 +25,8 @@ function CodeView() {
 
     const { id } = useParams();
     const [activeTab, setActiveTab] = useState('code');
-    const [files,setFiles]=useState(Lookup?.DEFAULT_FILE);
+    const [files,setFiles]=useState({});
+    const [environment, setEnvironment] = useState('react');
     const {messages,setMessages}=useContext(MessagesContext);
     const { selectedModel } = useModel();
     const UpdateFiles=useMutation(api.workspace.UpdateFiles);
@@ -40,9 +41,19 @@ function CodeView() {
         const result=await convex.query(api.workspace.GetWorkspace,{
             workspaceId:id
         });
+        
+        // Set environment from workspace
+        const workspaceEnvironment = result?.environment || 'react';
+        setEnvironment(workspaceEnvironment);
+        
+        // Get default files based on environment
+        const defaultFiles = workspaceEnvironment === 'html' 
+            ? Lookup.DEFAULT_FILE.HTML 
+            : Lookup.DEFAULT_FILE.REACT;
+        
         // Preprocess and validate files before merging
         const processedFiles = preprocessFiles(result?.fileData || {});
-        const mergedFiles = {...Lookup.DEFAULT_FILE, ...processedFiles};
+        const mergedFiles = {...defaultFiles, ...processedFiles};
         setFiles(mergedFiles);
     }
 
@@ -75,17 +86,24 @@ function CodeView() {
 
     const GenerateAiCode=async()=>{
         setLoading(true);
-        const PROMPT=JSON.stringify(messages)+" "+Prompt.CODE_GEN_PROMPT;
+        const PROMPT=JSON.stringify(messages);
         
         try {
             const result=await axios.post('/api/gen-ai-code',{
                 prompt:PROMPT,
-                model: selectedModel
+                model: selectedModel,
+                environment: environment
             });
             
             // Preprocess AI-generated files
             const processedAiFiles = preprocessFiles(result.data?.files || {});
-            const mergedFiles = {...Lookup.DEFAULT_FILE, ...processedAiFiles};
+            
+            // Get default files based on environment
+            const defaultFiles = environment === 'html' 
+                ? Lookup.DEFAULT_FILE.HTML 
+                : Lookup.DEFAULT_FILE.REACT;
+            
+            const mergedFiles = {...defaultFiles, ...processedAiFiles};
             setFiles(mergedFiles);
 
             await UpdateFiles({
@@ -126,19 +144,21 @@ function CodeView() {
                 }
             });
 
-            // Add package.json with dependencies
-            const packageJson = {
-                name: "generated-project",
-                version: "1.0.0",
-                private: true,
-                dependencies: Lookup.DEPENDANCY,
-                scripts: {
-                    "dev": "vite",
-                    "build": "vite build",
-                    "preview": "vite preview"
-                }
-            };
-            zip.file("package.json", JSON.stringify(packageJson, null, 2));
+            // Add package.json with dependencies only for React projects
+            if (environment === 'react') {
+                const packageJson = {
+                    name: "generated-project",
+                    version: "1.0.0",
+                    private: true,
+                    dependencies: Lookup.DEPENDANCY.REACT,
+                    scripts: {
+                        "dev": "vite",
+                        "build": "vite build",
+                        "preview": "vite preview"
+                    }
+                };
+                zip.file("package.json", JSON.stringify(packageJson, null, 2));
+            }
 
             // Generate the zip file
             const blob = await zip.generateAsync({ type: "blob" });
@@ -147,7 +167,7 @@ function CodeView() {
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'project-files.zip';
+            a.download = `${environment}-project-files.zip`;
             document.body.appendChild(a);
             a.click();
             window.URL.revokeObjectURL(url);
@@ -157,21 +177,42 @@ function CodeView() {
         }
     };
 
+    // Get Sandpack template based on environment
+    const getSandpackTemplate = () => {
+        return environment === 'html' ? 'static' : 'react';
+    };
+
+    // Get dependencies based on environment
+    const getDependencies = () => {
+        return environment === 'html' ? {} : Lookup.DEPENDANCY.REACT;
+    };
+
     return (
         <div className='relative'>
             <div className='bg-[#181818] w-full p-2 border'>
                 <div className='flex items-center justify-between'>
-                    <div className='flex items-center flex-wrap shrink-0 bg-black p-1 justify-center
-                    w-[140px] gap-3 rounded-full'>
-                        <h2 onClick={() => setActiveTab('code')}
-                            className={`text-sm cursor-pointer 
-                        ${activeTab == 'code' && 'text-blue-500 bg-blue-500 bg-opacity-25 p-1 px-2 rounded-full'}`}>
-                            Code</h2>
+                    <div className='flex items-center gap-4'>
+                        <div className='flex items-center flex-wrap shrink-0 bg-black p-1 justify-center
+                        w-[140px] gap-3 rounded-full'>
+                            <h2 onClick={() => setActiveTab('code')}
+                                className={`text-sm cursor-pointer 
+                            ${activeTab == 'code' && 'text-blue-500 bg-blue-500 bg-opacity-25 p-1 px-2 rounded-full'}`}>
+                                Code</h2>
 
-                        <h2 onClick={() => setActiveTab('preview')}
-                            className={`text-sm cursor-pointer 
-                        ${activeTab == 'preview' && 'text-blue-500 bg-blue-500 bg-opacity-25 p-1 px-2 rounded-full'}`}>
-                            Preview</h2>
+                            <h2 onClick={() => setActiveTab('preview')}
+                                className={`text-sm cursor-pointer 
+                            ${activeTab == 'preview' && 'text-blue-500 bg-blue-500 bg-opacity-25 p-1 px-2 rounded-full'}`}>
+                                Preview</h2>
+                        </div>
+                        
+                        {/* Environment Indicator */}
+                        <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                            environment === 'react' 
+                                ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' 
+                                : 'bg-orange-500/20 text-orange-400 border border-orange-500/30'
+                        }`}>
+                            {environment === 'react' ? 'React' : 'HTML/CSS/JS'}
+                        </div>
                     </div>
                     
                     {/* Download Button */}
@@ -186,13 +227,11 @@ function CodeView() {
             </div>
             <SandpackProvider 
             files={files}
-            template="react" 
+            template={getSandpackTemplate()}
             theme={'dark'}
             customSetup={{
-                dependencies: {
-                    ...Lookup.DEPENDANCY
-                },
-                entry: '/index.js'
+                dependencies: getDependencies(),
+                entry: environment === 'html' ? '/index.html' : '/index.js'
             }}
             options={{
                 externalResources: ['https://cdn.tailwindcss.com'],
@@ -227,7 +266,7 @@ function CodeView() {
             {loading&&<div className='p-10 bg-gray-900 opacity-80 absolute top-0 
             rounded-lg w-full h-full flex items-center justify-center'>
                 <Loader2Icon className='animate-spin h-10 w-10 text-white'/>
-                <h2 className='text-white'> Generating files...</h2>
+                <h2 className='text-white'> Generating {environment} files...</h2>
             </div>}
         </div>
     );

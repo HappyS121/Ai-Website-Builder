@@ -1,28 +1,36 @@
 import { NextResponse } from "next/server";
 import { GenAiCode, openRouterCodeSessions } from '@/configs/AiModel';
+import Prompt from "@/data/Prompt";
 
 export async function POST(req) {
-    const { prompt, model = 'gemini' } = await req.json();
+    const { prompt, model = 'gemini', environment = 'react' } = await req.json();
     
     try {
         let result;
         
+        // Select the appropriate code generation prompt based on environment
+        const codePrompt = environment === 'html' 
+            ? Prompt.CODE_GEN_PROMPT.HTML 
+            : Prompt.CODE_GEN_PROMPT.REACT;
+        
+        const fullPrompt = prompt + " " + codePrompt;
+        
         switch (model) {
             case 'deepseek-chat':
-                result = await openRouterCodeSessions.deepseekChat.sendMessage(prompt);
+                result = await openRouterCodeSessions.deepseekChat.sendMessage(fullPrompt);
                 break;
             case 'deepseek-r1':
-                result = await openRouterCodeSessions.deepseekR1.sendMessage(prompt);
+                result = await openRouterCodeSessions.deepseekR1.sendMessage(fullPrompt);
                 break;
             case 'gemini-openrouter':
-                result = await openRouterCodeSessions.geminiFlash.sendMessage(prompt);
+                result = await openRouterCodeSessions.geminiFlash.sendMessage(fullPrompt);
                 break;
             case 'qwen':
-                result = await openRouterCodeSessions.qwen.sendMessage(prompt);
+                result = await openRouterCodeSessions.qwen.sendMessage(fullPrompt);
                 break;
             case 'gemini':
             default:
-                result = await GenAiCode.sendMessage(prompt);
+                result = await GenAiCode.sendMessage(fullPrompt);
                 break;
         }
 
