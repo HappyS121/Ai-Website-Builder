@@ -15,19 +15,19 @@ const Workspace = () => {
                 <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
             </div>
 
-            {/* Content */}
-            <div className='relative z-10 p-6'>
-                <div className='grid grid-cols-1 lg:grid-cols-4 gap-6 h-[calc(100vh-3rem)]'>
+            {/* Content - Adjusted for thinner header */}
+            <div className='relative z-10 p-4'>
+                <div className='grid grid-cols-1 lg:grid-cols-4 gap-4 h-[calc(100vh-2rem)]'>
                     {/* Chat Panel */}
                     <div className='lg:col-span-1'>
-                        <div className="h-full glass-morphism rounded-2xl overflow-hidden shadow-2xl">
+                        <div className="h-full glass-morphism rounded-xl overflow-hidden shadow-2xl">
                             <ChatView />
                         </div>
                     </div>
                     
                     {/* Code Panel */}
                     <div className='lg:col-span-3'>
-                        <div className="h-full glass-morphism rounded-2xl overflow-hidden shadow-2xl">
+                        <div className="h-full glass-morphism rounded-xl overflow-hidden shadow-2xl">
                             <CodeView />
                         </div>
                     </div>
