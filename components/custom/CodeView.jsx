@@ -196,9 +196,9 @@ function CodeView() {
     ];
 
     return (
-        <div className='h-full bg-gradient-to-br from-slate-900 to-slate-800 flex flex-col'>
+        <div className='relative bg-gradient-to-br from-slate-900 to-slate-800'>
             {/* Narrower Header - Reduced padding and height */}
-            <div className='bg-slate-800/30 border-b border-slate-700/30 backdrop-blur-xl px-4 py-2 flex-shrink-0'>
+            <div className='bg-slate-800/30 border-b border-slate-700/30 backdrop-blur-xl px-4 py-2'>
                 <div className='flex items-center justify-between'>
                     <div className='flex items-center gap-4'>
                         {/* Compact Tab Selector */}
@@ -261,73 +261,73 @@ function CodeView() {
                 </div>
             </div>
 
-            {/* Code Editor - Takes remaining height */}
-            <div className="flex-1 overflow-hidden">
-                <SandpackProvider 
-                    files={files}
-                    template={getSandpackTemplate()}
-                    theme={{
-                        colors: {
-                            surface1: '#1e293b',
-                            surface2: '#334155',
-                            surface3: '#475569',
-                            disabled: '#64748b',
-                            base: '#f8fafc',
-                            clickable: '#e2e8f0',
-                            hover: '#cbd5e1',
-                            accent: '#3b82f6',
-                            error: '#ef4444',
-                            errorSurface: '#fecaca',
-                            warning: '#f59e0b',
-                            warningSurface: '#fed7aa'
-                        },
-                        syntax: {
-                            plain: '#f8fafc',
-                            comment: '#64748b',
-                            keyword: '#3b82f6',
-                            tag: '#06d6a0',
-                            punctuation: '#cbd5e1',
-                            definition: '#f59e0b',
-                            property: '#06d6a0',
-                            static: '#ef4444',
-                            string: '#10b981'
-                        },
-                        font: {
-                            body: 'Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif',
-                            mono: 'JetBrains Mono, Fira Code, Monaco, Consolas, monospace',
-                            size: '14px',
-                            lineHeight: '1.6'
-                        }
-                    }}
-                    customSetup={{
-                        dependencies: getDependencies(),
-                        entry: environment === 'html' ? '/index.html' : '/index.js'
-                    }}
-                    options={{
-                        bundlerTimeoutSecs: 120,
-                        recompileMode: "immediate",
-                        recompileDelay: 300,
-                        showNavigator: true,
-                        showTabs: true,
-                        showLineNumbers: true,
-                        showInlineErrors: true,
-                        wrapContent: true,
-                        editorHeight: '100%'
-                    }}
-                >
+            {/* Code Editor */}
+            <SandpackProvider 
+                files={files}
+                template={getSandpackTemplate()}
+                theme={{
+                    colors: {
+                        surface1: '#1e293b',
+                        surface2: '#334155',
+                        surface3: '#475569',
+                        disabled: '#64748b',
+                        base: '#f8fafc',
+                        clickable: '#e2e8f0',
+                        hover: '#cbd5e1',
+                        accent: '#3b82f6',
+                        error: '#ef4444',
+                        errorSurface: '#fecaca',
+                        warning: '#f59e0b',
+                        warningSurface: '#fed7aa'
+                    },
+                    syntax: {
+                        plain: '#f8fafc',
+                        comment: '#64748b',
+                        keyword: '#3b82f6',
+                        tag: '#06d6a0',
+                        punctuation: '#cbd5e1',
+                        definition: '#f59e0b',
+                        property: '#06d6a0',
+                        static: '#ef4444',
+                        string: '#10b981'
+                    },
+                    font: {
+                        body: 'Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif',
+                        mono: 'JetBrains Mono, Fira Code, Monaco, Consolas, monospace',
+                        size: '14px',
+                        lineHeight: '1.6'
+                    }
+                }}
+                customSetup={{
+                    dependencies: getDependencies(),
+                    entry: environment === 'html' ? '/index.html' : '/index.js'
+                }}
+                options={{
+                    bundlerTimeoutSecs: 120,
+                    recompileMode: "immediate",
+                    recompileDelay: 300,
+                    showNavigator: true,
+                    showTabs: true,
+                    showLineNumbers: true,
+                    showInlineErrors: true,
+                    wrapContent: true,
+                    editorHeight: 'calc(100vh - 8rem)' // Adjusted for narrower header
+                }}
+            >
+                <div className="relative">
                     <SandpackLayout>
                         {activeTab === 'code' ? (
                             <>
                                 <SandpackFileExplorer 
                                     style={{ 
-                                        height: '100%',
+                                        height: 'calc(100vh - 8rem)', // Adjusted for narrower header
                                         backgroundColor: '#1e293b',
                                         borderRight: '1px solid #334155'
                                     }} 
                                 />
                                 <SandpackCodeEditor 
                                     style={{ 
-                                        height: '100%',
+                                        height: 'calc(100vh - 8rem)', // Adjusted for narrower header
                                         backgroundColor: '#1e293b'
                                     }}
                                     showTabs
@@ -339,7 +339,7 @@ function CodeView() {
                         ) : (
                             <SandpackPreview 
                                 style={{ 
-                                    height: '100%',
+                                    height: 'calc(100vh - 8rem)', // Adjusted for narrower header
                                     backgroundColor: '#1e293b'
                                 }} 
                                 showNavigator={true}
@@ -348,8 +348,8 @@ function CodeView() {
                             />
                         )}
                     </SandpackLayout>
-                </SandpackProvider>
-            </div>
+                </div>
+            </SandpackProvider>
 
             {/* Loading Overlay */}
             {loading && (
