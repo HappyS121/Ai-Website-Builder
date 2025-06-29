@@ -11,7 +11,7 @@ export const useModel = () => {
 };
 
 export const ModelProvider = ({ children }) => {
-    const [selectedModel, setSelectedModel] = useState('gemini');
+    const [selectedModel, setSelectedModel] = useState('deepseek-chat');
 
     return (
         <ModelContext.Provider value={{
