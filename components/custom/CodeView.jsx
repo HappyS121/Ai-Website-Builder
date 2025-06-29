@@ -1,5 +1,5 @@
 "use client"
-import React, { use, useContext } from 'react';
+import React, { useContext } from 'react';
 import { useState } from 'react';
 import {
     SandpackProvider,
@@ -12,56 +12,48 @@ import Lookup from '@/data/Lookup';
 import { MessagesContext } from '@/context/MessagesContext';
 import { useModel } from '@/context/ModelContext';
 import axios from 'axios';
-import Prompt from '@/data/Prompt';
 import { useEffect } from 'react';
-import { UpdateFiles } from '@/convex/workspace';
 import { useConvex, useMutation } from 'convex/react';
 import { useParams } from 'next/navigation';
 import { api } from '@/convex/_generated/api';
-import { Loader2Icon, Download } from 'lucide-react';
+import { Loader2Icon, Download, Code, Eye, FolderOpen, Zap, Sparkles } from 'lucide-react';
 import JSZip from 'jszip';
 
 function CodeView() {
-
     const { id } = useParams();
     const [activeTab, setActiveTab] = useState('code');
-    const [files,setFiles]=useState({});
+    const [files, setFiles] = useState({});
     const [environment, setEnvironment] = useState('react');
-    const {messages,setMessages}=useContext(MessagesContext);
+    const { messages, setMessages } = useContext(MessagesContext);
     const { selectedModel } = useModel();
-    const UpdateFiles=useMutation(api.workspace.UpdateFiles);
-    const convex=useConvex();
-    const [loading,setLoading]=useState(false);
+    const UpdateFiles = useMutation(api.workspace.UpdateFiles);
+    const convex = useConvex();
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        id&&GetFiles();
+        id && GetFiles();
     }, [id])
 
-    const GetFiles=async()=>{
-        const result=await convex.query(api.workspace.GetWorkspace,{
-            workspaceId:id
+    const GetFiles = async () => {
+        const result = await convex.query(api.workspace.GetWorkspace, {
+            workspaceId: id
         });
         
-        // Set environment from workspace
         const workspaceEnvironment = result?.environment || 'react';
         setEnvironment(workspaceEnvironment);
         
-        // Get default files based on environment
         const defaultFiles = workspaceEnvironment === 'html' 
             ? Lookup.DEFAULT_FILE.HTML 
             : Lookup.DEFAULT_FILE.REACT;
         
-        // Preprocess and validate files before merging
         const processedFiles = preprocessFiles(result?.fileData || {});
-        const mergedFiles = {...defaultFiles, ...processedFiles};
+        const mergedFiles = { ...defaultFiles, ...processedFiles };
         setFiles(mergedFiles);
     }
 
-    // Add file preprocessing function
     const preprocessFiles = (files) => {
         const processed = {};
         Object.entries(files).forEach(([path, content]) => {
-            // Ensure the file has proper content structure
             if (typeof content === 'string') {
                 processed[path] = { code: content };
             } else if (content && typeof content === 'object') {
@@ -76,41 +68,38 @@ function CodeView() {
     }
 
     useEffect(() => {
-            if (messages?.length > 0) {
-                const role = messages[messages?.length - 1].role;
-                if (role === 'user') {
-                    GenerateAiCode();
-                }
+        if (messages?.length > 0) {
+            const role = messages[messages?.length - 1].role;
+            if (role === 'user') {
+                GenerateAiCode();
             }
-        }, [messages])
+        }
+    }, [messages])
 
-    const GenerateAiCode=async()=>{
+    const GenerateAiCode = async () => {
         setLoading(true);
-        const PROMPT=JSON.stringify(messages);
+        const PROMPT = JSON.stringify(messages);
         
         try {
-            const result=await axios.post('/api/gen-ai-code',{
-                prompt:PROMPT,
+            const result = await axios.post('/api/gen-ai-code', {
+                prompt: PROMPT,
                 model: selectedModel,
                 environment: environment
             });
             
-            // Preprocess AI-generated files
             const processedAiFiles = preprocessFiles(result.data?.files || {});
             
-            // Get default files based on environment
             const defaultFiles = environment === 'html' 
                 ? Lookup.DEFAULT_FILE.HTML 
                 : Lookup.DEFAULT_FILE.REACT;
             
-            const mergedFiles = {...defaultFiles, ...processedAiFiles};
+            const mergedFiles = { ...defaultFiles, ...processedAiFiles };
             setFiles(mergedFiles);
 
-            // Only call UpdateFiles if we have files to update
             if (result.data?.files && Object.keys(result.data.files).length > 0) {
                 await UpdateFiles({
-                    workspaceId:id,
-                    files:result.data?.files
+                    workspaceId: id,
+                    files: result.data?.files
                 });
             }
         } catch (error) {
@@ -121,12 +110,9 @@ function CodeView() {
     
     const downloadFiles = async () => {
         try {
-            // Create a new JSZip instance
             const zip = new JSZip();
             
-            // Add each file to the zip
             Object.entries(files).forEach(([filename, content]) => {
-                // Handle the file content based on its structure
                 let fileContent;
                 if (typeof content === 'string') {
                     fileContent = content;
@@ -134,20 +120,16 @@ function CodeView() {
                     if (content.code) {
                         fileContent = content.code;
                     } else {
-                        // If it's an object without code property, stringify it
                         fileContent = JSON.stringify(content, null, 2);
                     }
                 }
 
-                // Only add the file if we have content
                 if (fileContent) {
-                    // Remove leading slash if present
                     const cleanFileName = filename.startsWith('/') ? filename.slice(1) : filename;
                     zip.file(cleanFileName, fileContent);
                 }
             });
 
-            // Add package.json with dependencies only for React projects
             if (environment === 'react') {
                 const packageJson = {
                     name: "generated-project",
@@ -163,10 +145,8 @@ function CodeView() {
                 zip.file("package.json", JSON.stringify(packageJson, null, 2));
             }
 
-            // Generate the zip file
             const blob = await zip.generateAsync({ type: "blob" });
             
-            // Create download link and trigger download
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
@@ -180,96 +160,204 @@ function CodeView() {
         }
     };
 
-    // Get Sandpack template based on environment
     const getSandpackTemplate = () => {
         return environment === 'html' ? 'static' : 'react';
     };
 
-    // Get dependencies based on environment
     const getDependencies = () => {
         return environment === 'html' ? {} : Lookup.DEPENDANCY.REACT;
     };
 
-    return (
-        <div className='relative'>
-            <div className='bg-[#181818] w-full p-2 border'>
-                <div className='flex items-center justify-between'>
-                    <div className='flex items-center gap-4'>
-                        <div className='flex items-center flex-wrap shrink-0 bg-black p-1 justify-center
-                        w-[140px] gap-3 rounded-full'>
-                            <h2 onClick={() => setActiveTab('code')}
-                                className={`text-sm cursor-pointer 
-                            ${activeTab == 'code' && 'text-blue-500 bg-blue-500 bg-opacity-25 p-1 px-2 rounded-full'}`}>
-                                Code</h2>
+    const tabs = [
+        { id: 'code', name: 'Code', icon: Code },
+        { id: 'preview', name: 'Preview', icon: Eye }
+    ];
 
-                            <h2 onClick={() => setActiveTab('preview')}
-                                className={`text-sm cursor-pointer 
-                            ${activeTab == 'preview' && 'text-blue-500 bg-blue-500 bg-opacity-25 p-1 px-2 rounded-full'}`}>
-                                Preview</h2>
+    return (
+        <div className='relative liquid-glass rounded-3xl overflow-hidden'>
+            {/* macOS-style Header */}
+            <div className='macos-titlebar'>
+                <div className='flex items-center justify-between w-full'>
+                    <div className='flex items-center gap-6'>
+                        {/* macOS Traffic Lights */}
+                        <div className='macos-traffic-lights'>
+                            <div className='macos-traffic-light close'></div>
+                            <div className='macos-traffic-light minimize'></div>
+                            <div className='macos-traffic-light maximize'></div>
                         </div>
                         
-                        {/* Environment Indicator */}
-                        <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        {/* Tab Selector */}
+                        <div className='flex items-center liquid-glass p-1 rounded-xl border border-blue-500/30'>
+                            {tabs.map((tab) => {
+                                const IconComponent = tab.icon;
+                                return (
+                                    <button
+                                        key={tab.id}
+                                        onClick={() => setActiveTab(tab.id)}
+                                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all duration-300 ${
+                                            activeTab === tab.id
+                                                ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg animate-pulse-glow'
+                                                : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                                        }`}
+                                    >
+                                        <IconComponent className="h-4 w-4" />
+                                        {tab.name}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                        
+                        {/* Environment Badge */}
+                        <div className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-bold ${
                             environment === 'react' 
-                                ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' 
-                                : 'bg-orange-500/20 text-orange-400 border border-orange-500/30'
+                                ? 'bg-blue-500/10 text-blue-400 border-blue-500/30 animate-pulse-glow' 
+                                : 'bg-orange-500/10 text-orange-400 border-orange-500/30 animate-pulse-glow-turquoise'
                         }`}>
-                            {environment === 'react' ? 'React' : 'HTML/CSS/JS'}
+                            <div className="w-2 h-2 rounded-full bg-current animate-pulse"></div>
+                            {environment === 'react' ? 'React Environment' : 'HTML/CSS/JS Environment'}
+                        </div>
+
+                        {/* File Count */}
+                        <div className="flex items-center gap-2 text-slate-400 text-sm font-medium">
+                            <FolderOpen className="h-4 w-4" />
+                            <span>{Object.keys(files).length} files</span>
                         </div>
                     </div>
                     
-                    {/* Download Button */}
-                    <button
-                        onClick={downloadFiles}
-                        className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full transition-colors duration-200"
-                    >
-                        <Download className="h-4 w-4" />
-                        <span>Download Files</span>
-                    </button>
+                    {/* Actions */}
+                    <div className="flex items-center gap-4">
+                        {/* Status */}
+                        <div className="flex items-center gap-2 text-emerald-400 text-sm font-bold">
+                            <Zap className="h-4 w-4 animate-pulse" />
+                            <span>Live Preview</span>
+                        </div>
+                        
+                        {/* Download Button */}
+                        <button
+                            onClick={downloadFiles}
+                            className="btn-liquid-primary flex items-center gap-2 px-4 py-2 text-sm"
+                        >
+                            <Download className="h-4 w-4" />
+                            <span>Export Project</span>
+                        </button>
+                    </div>
                 </div>
             </div>
+
+            {/* Code Editor */}
             <SandpackProvider 
-            files={files}
-            template={getSandpackTemplate()}
-            theme={'dark'}
-            customSetup={{
-                dependencies: getDependencies(),
-                entry: environment === 'html' ? '/index.html' : '/index.js'
-            }}
-            options={{
-                bundlerTimeoutSecs: 120,
-                recompileMode: "immediate",
-                recompileDelay: 300
-            }}
+                files={files}
+                template={getSandpackTemplate()}
+                theme={{
+                    colors: {
+                        surface1: '#0f172a',
+                        surface2: '#1e293b',
+                        surface3: '#334155',
+                        disabled: '#64748b',
+                        base: '#f8fafc',
+                        clickable: '#e2e8f0',
+                        hover: '#cbd5e1',
+                        accent: '#3b82f6',
+                        error: '#ef4444',
+                        errorSurface: '#fecaca',
+                        warning: '#f59e0b',
+                        warningSurface: '#fed7aa'
+                    },
+                    syntax: {
+                        plain: '#f8fafc',
+                        comment: '#64748b',
+                        keyword: '#3b82f6',
+                        tag: '#06d6a0',
+                        punctuation: '#cbd5e1',
+                        definition: '#f59e0b',
+                        property: '#06d6a0',
+                        static: '#ef4444',
+                        string: '#10b981'
+                    },
+                    font: {
+                        body: 'Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif',
+                        mono: 'JetBrains Mono, Fira Code, Monaco, Consolas, monospace',
+                        size: '14px',
+                        lineHeight: '1.6'
+                    }
+                }}
+                customSetup={{
+                    dependencies: getDependencies(),
+                    entry: environment === 'html' ? '/index.html' : '/index.js'
+                }}
+                options={{
+                    bundlerTimeoutSecs: 120,
+                    recompileMode: "immediate",
+                    recompileDelay: 300,
+                    showNavigator: true,
+                    showTabs: true,
+                    showLineNumbers: true,
+                    showInlineErrors: true,
+                    wrapContent: true,
+                    editorHeight: '80vh'
+                }}
             >
-                <div className="relative">
+                <div className="relative macos-window">
                     <SandpackLayout>
-                        {activeTab=='code'?<>
-                            <SandpackFileExplorer style={{ height: '80vh' }} />
-                            <SandpackCodeEditor 
-                            style={{ height: '80vh' }}
-                            showTabs
-                            showLineNumbers
-                            showInlineErrors
-                            wrapContent />
-                        </>:
-                        <>
+                        {activeTab === 'code' ? (
+                            <>
+                                <SandpackFileExplorer 
+                                    style={{ 
+                                        height: '80vh',
+                                        backgroundColor: '#0f172a',
+                                        borderRight: '1px solid #334155'
+                                    }} 
+                                />
+                                <SandpackCodeEditor 
+                                    style={{ 
+                                        height: '80vh',
+                                        backgroundColor: '#0f172a'
+                                    }}
+                                    showTabs
+                                    showLineNumbers
+                                    showInlineErrors
+                                    wrapContent 
+                                />
+                            </>
+                        ) : (
                             <SandpackPreview 
-                                style={{ height: '80vh' }} 
+                                style={{ 
+                                    height: '80vh',
+                                    backgroundColor: '#0f172a'
+                                }} 
                                 showNavigator={true}
                                 showOpenInCodeSandbox={false}
                                 showRefreshButton={true}
                             />
-                        </>}
+                        )}
                     </SandpackLayout>
                 </div>
             </SandpackProvider>
 
-            {loading&&<div className='p-10 bg-gray-900 opacity-80 absolute top-0 
-            rounded-lg w-full h-full flex items-center justify-center'>
-                <Loader2Icon className='animate-spin h-10 w-10 text-white'/>
-                <h2 className='text-white'> Generating {environment} files...</h2>
-            </div>}
+            {/* Loading Overlay */}
+            {loading && (
+                <div className='absolute inset-0 liquid-glass flex items-center justify-center z-50'>
+                    <div className="liquid-glass p-10 rounded-3xl text-center hover-lift">
+                        <div className="flex items-center justify-center mb-6">
+                            <div className="relative">
+                                <Loader2Icon className='animate-spin-glow h-16 w-16 text-blue-400'/>
+                                <div className="absolute inset-0 h-16 w-16 border-2 border-cyan-400/30 rounded-full animate-pulse"></div>
+                            </div>
+                        </div>
+                        <h3 className='text-white text-2xl font-bold mb-3 text-glow'>
+                            Generating {environment} Project
+                        </h3>
+                        <p className="text-slate-400 font-medium">
+                            AI is crafting your code...
+                        </p>
+                        <div className="flex justify-center gap-2 mt-6">
+                            <div className="w-3 h-3 bg-blue-400 rounded-full animate-bounce"></div>
+                            <div className="w-3 h-3 bg-cyan-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                            <div className="w-3 h-3 bg-teal-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

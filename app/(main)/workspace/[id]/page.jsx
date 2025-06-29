@@ -4,17 +4,40 @@ import React from 'react';
 
 const Workspace = () => {
     return (
-        <div className="min-h-screen bg-gray-950 relative overflow-hidden">
-            {/* Animated background elements */}
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px]">
-                <div className="absolute left-1/2 top-0 h-[500px] w-[1000px] -translate-x-1/2 bg-[radial-gradient(circle_400px_at_50%_300px,#3b82f625,transparent)]" />
+        <div className="min-h-screen relative overflow-hidden">
+            {/* Animated Background */}
+            <div className="absolute inset-0">
+                {/* Gradient Orbs */}
+                <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl animate-gradient-xy"></div>
+                <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl animate-gradient-xy" style={{animationDelay: '2s'}}></div>
+                
+                {/* Floating Particles */}
+                <div className="particles">
+                    {Array.from({ length: 20 }).map((_, i) => (
+                        <div
+                            key={i}
+                            className="particle"
+                            style={{
+                                left: `${Math.random() * 100}%`,
+                                top: `${Math.random() * 100}%`,
+                                animationDelay: `${Math.random() * 8}s`,
+                                animationDuration: `${6 + Math.random() * 4}s`
+                            }}
+                        />
+                    ))}
+                </div>
             </div>
 
             {/* Content */}
-            <div className='relative z-10 p-10'>
-                <div className='grid grid-cols-1 md:grid-cols-4 gap-10'>
-                    <ChatView />
-                    <div className='col-span-3'>
+            <div className='relative z-10 p-8'>
+                <div className='grid grid-cols-1 lg:grid-cols-4 gap-8 h-[calc(100vh-4rem)]'>
+                    {/* Chat Panel */}
+                    <div className='lg:col-span-1'>
+                        <ChatView />
+                    </div>
+                    
+                    {/* Code Panel */}
+                    <div className='lg:col-span-3'>
                         <CodeView />
                     </div>
                 </div>
