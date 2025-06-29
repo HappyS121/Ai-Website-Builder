@@ -17,7 +17,7 @@ function Header() {
                         </div>
                         <div className="flex flex-col">
                             <h1 className="text-2xl font-black text-gradient-animated">
-                                AI Code Builder
+                                LanSoft Dev
                             </h1>
                             <p className="text-sm text-slate-400 hidden sm:block font-medium">
                                 Next-gen development platform

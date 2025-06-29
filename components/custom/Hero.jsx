@@ -1,7 +1,7 @@
 "use client"
 import Lookup from '@/data/Lookup';
 import { MessagesContext } from '@/context/MessagesContext';
-import { ArrowRight, Sparkles, Send, Wand2, Loader2, Code, Globe, Zap, Star, Rocket } from 'lucide-react';
+import { ArrowRight, Send, Wand2, Loader2, Code, Globe, Rocket } from 'lucide-react';
 import React, { useContext, useState, useEffect } from 'react';
 import { useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
@@ -132,51 +132,6 @@ function Hero() {
 
             <div className="container mx-auto px-6 py-20 relative z-10">
                 <div className="flex flex-col items-center justify-center space-y-16">
-                    {/* Hero Header */}
-                    <div className="text-center space-y-8 max-w-5xl">
-                        {/* Badge */}
-                        <div className="inline-flex items-center justify-center space-x-3 liquid-glass rounded-full px-8 py-4 hover-lift shimmer-effect">
-                            <Star className="h-6 w-6 text-blue-400 animate-spin-glow" />
-                            <span className="text-blue-400 text-lg font-bold tracking-wide uppercase">
-                                Next-Gen AI Development
-                            </span>
-                            <Zap className="h-6 w-6 text-cyan-400 animate-pulse" />
-                        </div>
-
-                        {/* Main Title */}
-                        <h1 className="text-7xl md:text-9xl font-black leading-tight">
-                            <span className="block text-gradient-animated text-glow animate-float">
-                                Build the
-                            </span>
-                            <span className="block text-gradient-animated text-glow animate-float-delayed">
-                                Future
-                            </span>
-                        </h1>
-
-                        {/* Subtitle */}
-                        <p className="text-2xl md:text-3xl text-slate-300 max-w-4xl mx-auto leading-relaxed font-light">
-                            Transform your ideas into production-ready applications with 
-                            <span className="text-gradient-animated font-semibold"> AI-powered </span>
-                            development tools
-                        </p>
-
-                        {/* Stats */}
-                        <div className="flex flex-wrap justify-center gap-12 mt-16">
-                            <div className="text-center animate-float">
-                                <div className="text-4xl font-black text-gradient-animated">10K+</div>
-                                <div className="text-sm text-slate-400 font-medium">Projects Created</div>
-                            </div>
-                            <div className="text-center animate-float-delayed">
-                                <div className="text-4xl font-black text-gradient-animated">99%</div>
-                                <div className="text-sm text-slate-400 font-medium">Success Rate</div>
-                            </div>
-                            <div className="text-center animate-float">
-                                <div className="text-4xl font-black text-gradient-animated">5min</div>
-                                <div className="text-sm text-slate-400 font-medium">Average Build</div>
-                            </div>
-                        </div>
-                    </div>
-
                     {/* Environment Selector */}
                     <div className="w-full max-w-5xl">
                         <div className="text-center mb-10">
@@ -211,7 +166,7 @@ function Hero() {
                                             {/* Header */}
                                             <div className="flex items-center justify-between mb-8">
                                                 <div className="flex items-center space-x-6">
-                                                    <div className={`p-5 rounded-2xl bg-gradient-to-r ${env.color} shadow-2xl animate-float`}>
+                                                    <div className={`p-5 rounded-2xl bg-gradient-to-r ${env.color} shadow-2xl`}>
                                                         <IconComponent className="h-10 w-10 text-white" />
                                                     </div>
                                                     <div>
@@ -320,7 +275,7 @@ function Hero() {
                                 >
                                     {/* Icon */}
                                     <div className="flex items-center justify-between mb-6">
-                                        <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center animate-float">
+                                        <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center">
                                             <Code className="h-6 w-6 text-white" />
                                         </div>
                                         <ArrowRight className="h-6 w-6 text-slate-400 group-hover:text-blue-400 transition-colors duration-300 group-hover:translate-x-2" />
