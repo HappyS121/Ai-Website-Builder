@@ -27,7 +27,7 @@ function CodeView() {
     const [activeTab, setActiveTab] = useState('code');
     const [files,setFiles]=useState(Lookup?.DEFAULT_FILE);
     const {messages,setMessages}=useContext(MessagesContext);
-    const { selectedCodeModel } = useModel();
+    const { selectedModel } = useModel();
     const UpdateFiles=useMutation(api.workspace.UpdateFiles);
     const convex=useConvex();
     const [loading,setLoading]=useState(false);
@@ -80,7 +80,7 @@ function CodeView() {
         try {
             const result=await axios.post('/api/gen-ai-code',{
                 prompt:PROMPT,
-                model: selectedCodeModel
+                model: selectedModel
             });
             
             // Preprocess AI-generated files

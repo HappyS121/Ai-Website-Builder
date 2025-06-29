@@ -12,14 +12,11 @@ export const useModel = () => {
 
 export const ModelProvider = ({ children }) => {
     const [selectedModel, setSelectedModel] = useState('gemini');
-    const [selectedCodeModel, setSelectedCodeModel] = useState('gemini');
 
     return (
         <ModelContext.Provider value={{
             selectedModel,
-            setSelectedModel,
-            selectedCodeModel,
-            setSelectedCodeModel
+            setSelectedModel
         }}>
             {children}
         </ModelContext.Provider>
