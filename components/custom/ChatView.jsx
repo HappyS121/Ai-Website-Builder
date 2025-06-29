@@ -9,11 +9,13 @@ import { useMutation } from 'convex/react';
 import Prompt from '@/data/Prompt';
 import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
+import { useModel } from '@/context/ModelContext';
 
 function ChatView() {
     const { id } = useParams();
     const convex = useConvex();
     const { messages, setMessages } = useContext(MessagesContext);
+    const { selectedModel } = useModel();
     const [userInput, setUserInput] = useState();
     const [loading, setLoading] = useState(false);
     const UpdateMessages = useMutation(api.workspace.UpdateWorkspace);
@@ -42,19 +44,30 @@ function ChatView() {
     const GetAiResponse = async () => {
         setLoading(true);
         const PROMPT = JSON.stringify(messages) + Prompt.CHAT_PROMPT;
-        const result = await axios.post('/api/ai-chat', {
-            prompt: PROMPT
-        });
+        
+        try {
+            const result = await axios.post('/api/ai-chat', {
+                prompt: PROMPT,
+                model: selectedModel
+            });
 
-        const aiResp = {
-            role: 'ai',
-            content: result.data.result
+            const aiResp = {
+                role: 'ai',
+                content: result.data.result
+            }
+            setMessages(prev => [...prev, aiResp]);
+            await UpdateMessages({
+                messages: [...messages, aiResp],
+                workspaceId: id
+            })
+        } catch (error) {
+            console.error('Error getting AI response:', error);
+            const errorResp = {
+                role: 'ai',
+                content: 'Sorry, I encountered an error while processing your request. Please try again.'
+            }
+            setMessages(prev => [...prev, errorResp]);
         }
-        setMessages(prev => [...prev, aiResp]);
-        await UpdateMessages({
-            messages: [...messages, aiResp],
-            workspaceId: id
-        })
         setLoading(false);
     }
 

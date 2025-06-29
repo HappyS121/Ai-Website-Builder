@@ -10,6 +10,7 @@ import {
 } from "@codesandbox/sandpack-react";
 import Lookup from '@/data/Lookup';
 import { MessagesContext } from '@/context/MessagesContext';
+import { useModel } from '@/context/ModelContext';
 import axios from 'axios';
 import Prompt from '@/data/Prompt';
 import { useEffect } from 'react';
@@ -26,6 +27,7 @@ function CodeView() {
     const [activeTab, setActiveTab] = useState('code');
     const [files,setFiles]=useState(Lookup?.DEFAULT_FILE);
     const {messages,setMessages}=useContext(MessagesContext);
+    const { selectedCodeModel } = useModel();
     const UpdateFiles=useMutation(api.workspace.UpdateFiles);
     const convex=useConvex();
     const [loading,setLoading]=useState(false);
@@ -74,19 +76,25 @@ function CodeView() {
     const GenerateAiCode=async()=>{
         setLoading(true);
         const PROMPT=JSON.stringify(messages)+" "+Prompt.CODE_GEN_PROMPT;
-        const result=await axios.post('/api/gen-ai-code',{
-            prompt:PROMPT
-        });
         
-        // Preprocess AI-generated files
-        const processedAiFiles = preprocessFiles(result.data?.files || {});
-        const mergedFiles = {...Lookup.DEFAULT_FILE, ...processedAiFiles};
-        setFiles(mergedFiles);
+        try {
+            const result=await axios.post('/api/gen-ai-code',{
+                prompt:PROMPT,
+                model: selectedCodeModel
+            });
+            
+            // Preprocess AI-generated files
+            const processedAiFiles = preprocessFiles(result.data?.files || {});
+            const mergedFiles = {...Lookup.DEFAULT_FILE, ...processedAiFiles};
+            setFiles(mergedFiles);
 
-        await UpdateFiles({
-            workspaceId:id,
-            files:result.data?.files
-        });
+            await UpdateFiles({
+                workspaceId:id,
+                files:result.data?.files
+            });
+        } catch (error) {
+            console.error('Error generating code:', error);
+        }
         setLoading(false);
     }
     

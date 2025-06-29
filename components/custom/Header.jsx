@@ -1,5 +1,6 @@
 import React from 'react';
 import { Code, Sparkles } from 'lucide-react';
+import ModelSelector from './ModelSelector';
 
 function Header() {
     return (
@@ -16,8 +17,10 @@ function Header() {
                         </h1>
                     </div>
 
-                    {/* Status Badge */}
-                    <div className="flex items-center">
+                    {/* Model Selectors and Status */}
+                    <div className="flex items-center space-x-4">
+                        <ModelSelector type="chat" />
+                        <ModelSelector type="code" />
                         <div className="flex items-center space-x-2 bg-green-500/10 text-green-400 px-3 py-1.5 rounded-full text-sm font-medium">
                             <Sparkles className="h-4 w-4" />
                             <span>AI Ready</span>

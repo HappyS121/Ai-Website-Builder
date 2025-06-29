@@ -5,6 +5,9 @@ const {
 } = require("@google/generative-ai");
 
 const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+const openRouterApiKey = process.env.NEXT_PUBLIC_OPENROUTER_API_KEY;
+
+// Gemini Configuration
 const genAI = new GoogleGenerativeAI(apiKey);
 
 const model = genAI.getGenerativeModel({
@@ -35,10 +38,127 @@ const EnhancePromptConfig = {
     responseMimeType: "application/json",
 };
 
+// OpenRouter Configuration
+const OPENROUTER_MODELS = {
+    DEEPSEEK_CHAT: "deepseek/deepseek-chat-v3-0324:free",
+    DEEPSEEK_R1: "deepseek/deepseek-r1-0528:free",
+    GEMINI_FLASH: "google/gemini-2.0-flash-exp:free",
+    QWEN: "qwen/qwen3-235b-a22b:free"
+};
+
+// OpenRouter API call function
+const callOpenRouter = async (model, messages, config = {}) => {
+    if (!openRouterApiKey) {
+        throw new Error("OpenRouter API key not configured");
+    }
+
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+            "Authorization": `Bearer ${openRouterApiKey}`,
+            "Content-Type": "application/json",
+            "HTTP-Referer": process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
+            "X-Title": "AI Website Builder"
+        },
+        body: JSON.stringify({
+            model: model,
+            messages: messages,
+            temperature: config.temperature || 0.7,
+            max_tokens: config.maxTokens || 4000,
+            top_p: config.topP || 0.9,
+            stream: false
+        })
+    });
+
+    if (!response.ok) {
+        const error = await response.text();
+        throw new Error(`OpenRouter API error: ${error}`);
+    }
+
+    const data = await response.json();
+    return data.choices[0].message.content;
+};
+
+// OpenRouter Chat Sessions
+export const openRouterChatSessions = {
+    deepseekChat: {
+        sendMessage: async (prompt) => {
+            const messages = [{ role: "user", content: prompt }];
+            const content = await callOpenRouter(OPENROUTER_MODELS.DEEPSEEK_CHAT, messages);
+            return { response: { text: () => content } };
+        }
+    },
+    deepseekR1: {
+        sendMessage: async (prompt) => {
+            const messages = [{ role: "user", content: prompt }];
+            const content = await callOpenRouter(OPENROUTER_MODELS.DEEPSEEK_R1, messages);
+            return { response: { text: () => content } };
+        }
+    },
+    geminiFlash: {
+        sendMessage: async (prompt) => {
+            const messages = [{ role: "user", content: prompt }];
+            const content = await callOpenRouter(OPENROUTER_MODELS.GEMINI_FLASH, messages);
+            return { response: { text: () => content } };
+        }
+    },
+    qwen: {
+        sendMessage: async (prompt) => {
+            const messages = [{ role: "user", content: prompt }];
+            const content = await callOpenRouter(OPENROUTER_MODELS.QWEN, messages);
+            return { response: { text: () => content } };
+        }
+    }
+};
+
+// OpenRouter Code Generation Sessions
+export const openRouterCodeSessions = {
+    deepseekChat: {
+        sendMessage: async (prompt) => {
+            const messages = [{ role: "user", content: prompt }];
+            const content = await callOpenRouter(OPENROUTER_MODELS.DEEPSEEK_CHAT, messages, {
+                temperature: 0.3,
+                maxTokens: 8000
+            });
+            return { response: { text: () => content } };
+        }
+    },
+    deepseekR1: {
+        sendMessage: async (prompt) => {
+            const messages = [{ role: "user", content: prompt }];
+            const content = await callOpenRouter(OPENROUTER_MODELS.DEEPSEEK_R1, messages, {
+                temperature: 0.3,
+                maxTokens: 8000
+            });
+            return { response: { text: () => content } };
+        }
+    },
+    geminiFlash: {
+        sendMessage: async (prompt) => {
+            const messages = [{ role: "user", content: prompt }];
+            const content = await callOpenRouter(OPENROUTER_MODELS.GEMINI_FLASH, messages, {
+                temperature: 0.3,
+                maxTokens: 8000
+            });
+            return { response: { text: () => content } };
+        }
+    },
+    qwen: {
+        sendMessage: async (prompt) => {
+            const messages = [{ role: "user", content: prompt }];
+            const content = await callOpenRouter(OPENROUTER_MODELS.QWEN, messages, {
+                temperature: 0.3,
+                maxTokens: 8000
+            });
+            return { response: { text: () => content } };
+        }
+    }
+};
+
+// Original Gemini Sessions (keeping for backward compatibility)
 export const chatSession = model.startChat({
     generationConfig,
-    history: [
-    ],
+    history: [],
 });
 
 export const GenAiCode = model.startChat({
@@ -57,12 +177,38 @@ export const GenAiCode = model.startChat({
             ],
           },
     ],
-})
+});
 
 export const enhancePromptSession = model.startChat({
     generationConfig: EnhancePromptConfig,
     history: [],
 });
 
-// const result = await chatSession.sendMessage("INSERT_INPUT_HERE");
-// console.log(result.response.text());
+// Export available models for UI selection
+export const AVAILABLE_MODELS = {
+    GEMINI: {
+        name: "Gemini 2.0 Flash",
+        provider: "Google",
+        key: "gemini"
+    },
+    DEEPSEEK_CHAT: {
+        name: "DeepSeek Chat V3",
+        provider: "OpenRouter",
+        key: "deepseek-chat"
+    },
+    DEEPSEEK_R1: {
+        name: "DeepSeek R1",
+        provider: "OpenRouter", 
+        key: "deepseek-r1"
+    },
+    GEMINI_OPENROUTER: {
+        name: "Gemini 2.0 Flash (OpenRouter)",
+        provider: "OpenRouter",
+        key: "gemini-openrouter"
+    },
+    QWEN: {
+        name: "Qwen 3 235B",
+        provider: "OpenRouter",
+        key: "qwen"
+    }
+};
