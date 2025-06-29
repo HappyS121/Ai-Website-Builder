@@ -196,23 +196,23 @@ function CodeView() {
     ];
 
     return (
-        <div className='relative bg-gradient-to-br from-slate-900 to-slate-800'>
-            {/* Narrower Header - Reduced padding and height */}
-            <div className='bg-slate-800/30 border-b border-slate-700/30 backdrop-blur-xl px-4 py-2'>
+        <div className='relative bg-gradient-to-br from-slate-900 to-slate-800 w-full h-full flex flex-col'>
+            {/* Ultra Compact Header */}
+            <div className='bg-slate-800/20 border-b border-slate-700/20 backdrop-blur-xl px-3 py-1.5 flex-shrink-0'>
                 <div className='flex items-center justify-between'>
-                    <div className='flex items-center gap-4'>
-                        {/* Compact Tab Selector */}
-                        <div className='flex items-center bg-slate-900/40 p-0.5 rounded-lg border border-slate-700/30'>
+                    <div className='flex items-center gap-2 sm:gap-3'>
+                        {/* Ultra Compact Tab Selector */}
+                        <div className='flex items-center bg-slate-900/30 p-0.5 rounded-md border border-slate-700/20'>
                             {tabs.map((tab) => {
                                 const IconComponent = tab.icon;
                                 return (
                                     <button
                                         key={tab.id}
                                         onClick={() => setActiveTab(tab.id)}
-                                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-300 ${
+                                        className={`flex items-center gap-1 px-2 py-1 rounded-sm text-xs font-medium transition-all duration-300 ${
                                             activeTab === tab.id
-                                                ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-md'
-                                                : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                                                ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-sm'
+                                                : 'text-slate-400 hover:text-white hover:bg-slate-800/30'
                                         }`}
                                     >
                                         <IconComponent className="h-3 w-3" />
@@ -222,37 +222,37 @@ function CodeView() {
                             })}
                         </div>
                         
-                        {/* Compact Environment Badge */}
-                        <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-medium ${
+                        {/* Ultra Compact Environment Badge */}
+                        <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full border text-xs ${
                             environment === 'react' 
-                                ? 'bg-blue-500/10 text-blue-400 border-blue-500/30' 
-                                : 'bg-orange-500/10 text-orange-400 border-orange-500/30'
+                                ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' 
+                                : 'bg-orange-500/10 text-orange-400 border-orange-500/20'
                         }`}>
-                            <div className="w-1.5 h-1.5 rounded-full bg-current animate-pulse"></div>
-                            <span className="hidden sm:inline">
-                                {environment === 'react' ? 'React' : 'HTML/CSS/JS'}
+                            <div className="w-1 h-1 rounded-full bg-current animate-pulse"></div>
+                            <span className="hidden sm:inline text-xs">
+                                {environment === 'react' ? 'React' : 'HTML'}
                             </span>
                         </div>
 
-                        {/* Compact File Count */}
-                        <div className="flex items-center gap-1.5 text-slate-400 text-xs">
+                        {/* File Count - Hidden on small screens */}
+                        <div className="hidden md:flex items-center gap-1 text-slate-400 text-xs">
                             <FolderOpen className="h-3 w-3" />
-                            <span className="hidden md:inline">{Object.keys(files).length} files</span>
+                            <span>{Object.keys(files).length}</span>
                         </div>
                     </div>
                     
-                    {/* Compact Actions */}
-                    <div className="flex items-center gap-2">
-                        {/* Compact Status */}
-                        <div className="flex items-center gap-1.5 text-emerald-400 text-xs">
+                    {/* Ultra Compact Actions */}
+                    <div className="flex items-center gap-1.5">
+                        {/* Status - Hidden on small screens */}
+                        <div className="hidden lg:flex items-center gap-1 text-emerald-400 text-xs">
                             <Zap className="h-3 w-3" />
-                            <span className="hidden lg:inline">Live</span>
+                            <span>Live</span>
                         </div>
                         
-                        {/* Compact Download Button */}
+                        {/* Ultra Compact Download Button */}
                         <button
                             onClick={downloadFiles}
-                            className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg flex items-center gap-1.5"
+                            className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white px-2 py-1 rounded-md text-xs font-medium transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-sm flex items-center gap-1"
                         >
                             <Download className="h-3 w-3" />
                             <span className="hidden sm:inline">Export</span>
@@ -261,110 +261,112 @@ function CodeView() {
                 </div>
             </div>
 
-            {/* Code Editor */}
-            <SandpackProvider 
-                files={files}
-                template={getSandpackTemplate()}
-                theme={{
-                    colors: {
-                        surface1: '#1e293b',
-                        surface2: '#334155',
-                        surface3: '#475569',
-                        disabled: '#64748b',
-                        base: '#f8fafc',
-                        clickable: '#e2e8f0',
-                        hover: '#cbd5e1',
-                        accent: '#3b82f6',
-                        error: '#ef4444',
-                        errorSurface: '#fecaca',
-                        warning: '#f59e0b',
-                        warningSurface: '#fed7aa'
-                    },
-                    syntax: {
-                        plain: '#f8fafc',
-                        comment: '#64748b',
-                        keyword: '#3b82f6',
-                        tag: '#06d6a0',
-                        punctuation: '#cbd5e1',
-                        definition: '#f59e0b',
-                        property: '#06d6a0',
-                        static: '#ef4444',
-                        string: '#10b981'
-                    },
-                    font: {
-                        body: 'Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif',
-                        mono: 'JetBrains Mono, Fira Code, Monaco, Consolas, monospace',
-                        size: '14px',
-                        lineHeight: '1.6'
-                    }
-                }}
-                customSetup={{
-                    dependencies: getDependencies(),
-                    entry: environment === 'html' ? '/index.html' : '/index.js'
-                }}
-                options={{
-                    bundlerTimeoutSecs: 120,
-                    recompileMode: "immediate",
-                    recompileDelay: 300,
-                    showNavigator: true,
-                    showTabs: true,
-                    showLineNumbers: true,
-                    showInlineErrors: true,
-                    wrapContent: true,
-                    editorHeight: 'calc(100vh - 8rem)' // Adjusted for narrower header
-                }}
-            >
-                <div className="relative">
-                    <SandpackLayout>
-                        {activeTab === 'code' ? (
-                            <>
-                                <SandpackFileExplorer 
+            {/* Code Editor - Takes remaining space */}
+            <div className="flex-1 min-h-0">
+                <SandpackProvider 
+                    files={files}
+                    template={getSandpackTemplate()}
+                    theme={{
+                        colors: {
+                            surface1: '#1e293b',
+                            surface2: '#334155',
+                            surface3: '#475569',
+                            disabled: '#64748b',
+                            base: '#f8fafc',
+                            clickable: '#e2e8f0',
+                            hover: '#cbd5e1',
+                            accent: '#3b82f6',
+                            error: '#ef4444',
+                            errorSurface: '#fecaca',
+                            warning: '#f59e0b',
+                            warningSurface: '#fed7aa'
+                        },
+                        syntax: {
+                            plain: '#f8fafc',
+                            comment: '#64748b',
+                            keyword: '#3b82f6',
+                            tag: '#06d6a0',
+                            punctuation: '#cbd5e1',
+                            definition: '#f59e0b',
+                            property: '#06d6a0',
+                            static: '#ef4444',
+                            string: '#10b981'
+                        },
+                        font: {
+                            body: 'Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif',
+                            mono: 'JetBrains Mono, Fira Code, Monaco, Consolas, monospace',
+                            size: '14px',
+                            lineHeight: '1.6'
+                        }
+                    }}
+                    customSetup={{
+                        dependencies: getDependencies(),
+                        entry: environment === 'html' ? '/index.html' : '/index.js'
+                    }}
+                    options={{
+                        bundlerTimeoutSecs: 120,
+                        recompileMode: "immediate",
+                        recompileDelay: 300,
+                        showNavigator: true,
+                        showTabs: true,
+                        showLineNumbers: true,
+                        showInlineErrors: true,
+                        wrapContent: true,
+                        editorHeight: '100%'
+                    }}
+                >
+                    <div className="h-full">
+                        <SandpackLayout>
+                            {activeTab === 'code' ? (
+                                <>
+                                    <SandpackFileExplorer 
+                                        style={{ 
+                                            height: '100%',
+                                            backgroundColor: '#1e293b',
+                                            borderRight: '1px solid #334155'
+                                        }} 
+                                    />
+                                    <SandpackCodeEditor 
+                                        style={{ 
+                                            height: '100%',
+                                            backgroundColor: '#1e293b'
+                                        }}
+                                        showTabs
+                                        showLineNumbers
+                                        showInlineErrors
+                                        wrapContent 
+                                    />
+                                </>
+                            ) : (
+                                <SandpackPreview 
                                     style={{ 
-                                        height: 'calc(100vh - 8rem)', // Adjusted for narrower header
-                                        backgroundColor: '#1e293b',
-                                        borderRight: '1px solid #334155'
-                                    }} 
-                                />
-                                <SandpackCodeEditor 
-                                    style={{ 
-                                        height: 'calc(100vh - 8rem)', // Adjusted for narrower header
+                                        height: '100%',
                                         backgroundColor: '#1e293b'
-                                    }}
-                                    showTabs
-                                    showLineNumbers
-                                    showInlineErrors
-                                    wrapContent 
+                                    }} 
+                                    showNavigator={true}
+                                    showOpenInCodeSandbox={false}
+                                    showRefreshButton={true}
                                 />
-                            </>
-                        ) : (
-                            <SandpackPreview 
-                                style={{ 
-                                    height: 'calc(100vh - 8rem)', // Adjusted for narrower header
-                                    backgroundColor: '#1e293b'
-                                }} 
-                                showNavigator={true}
-                                showOpenInCodeSandbox={false}
-                                showRefreshButton={true}
-                            />
-                        )}
-                    </SandpackLayout>
-                </div>
-            </SandpackProvider>
+                            )}
+                        </SandpackLayout>
+                    </div>
+                </SandpackProvider>
+            </div>
 
             {/* Loading Overlay */}
             {loading && (
                 <div className='absolute inset-0 bg-slate-900/90 backdrop-blur-sm flex items-center justify-center z-50'>
-                    <div className="glass-morphism p-8 rounded-2xl text-center">
+                    <div className="glass-morphism p-6 sm:p-8 rounded-2xl text-center">
                         <div className="flex items-center justify-center mb-4">
                             <div className="relative">
-                                <Loader2Icon className='animate-spin h-12 w-12 text-blue-400'/>
-                                <div className="absolute inset-0 h-12 w-12 border-2 border-cyan-400/30 rounded-full animate-pulse"></div>
+                                <Loader2Icon className='animate-spin h-10 w-10 sm:h-12 sm:w-12 text-blue-400'/>
+                                <div className="absolute inset-0 h-10 w-10 sm:h-12 sm:w-12 border-2 border-cyan-400/30 rounded-full animate-pulse"></div>
                             </div>
                         </div>
-                        <h3 className='text-white text-xl font-semibold mb-2'>
+                        <h3 className='text-white text-lg sm:text-xl font-semibold mb-2'>
                             Generating {environment} Project
                         </h3>
-                        <p className="text-slate-400">
+                        <p className="text-slate-400 text-sm sm:text-base">
                             AI is crafting your code...
                         </p>
                         <div className="flex justify-center gap-1 mt-4">
