@@ -1,6 +1,6 @@
 "use client"
 import React from 'react';
-import { ChevronDown, Bot, Zap, Star, Sparkles } from 'lucide-react';
+import { ChevronDown, Bot, Zap, Star } from 'lucide-react';
 import { AVAILABLE_MODELS } from '@/configs/AiModel';
 import { useModel } from '@/context/ModelContext';
 
@@ -23,83 +23,83 @@ function ModelSelector() {
         <div className="relative">
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center gap-3 bg-slate-800 hover:bg-slate-700 border border-blue-500/30 rounded-2xl px-6 py-3 text-sm text-slate-300 transition-all duration-300 group shadow-lg"
+                className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 border border-blue-500/30 rounded-xl px-3 py-1.5 text-xs text-slate-300 transition-all duration-300 group shadow-lg"
             >
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg animate-pulse-glow">
-                        <Bot className="h-5 w-5 text-white" />
+                <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center shadow-lg">
+                        <Bot className="h-3 w-3 text-white" />
                     </div>
                     <div className="text-left">
-                        <div className="font-bold text-white group-hover:text-blue-400 transition-colors duration-200">
+                        <div className="font-bold text-white group-hover:text-blue-400 transition-colors duration-200 text-xs">
                             {currentModelInfo.name}
                         </div>
-                        <div className="text-xs text-slate-400 font-medium">
+                        <div className="text-xs text-slate-400 font-medium leading-none">
                             {currentModelInfo.provider}
                         </div>
                     </div>
                 </div>
-                <ChevronDown className={`h-5 w-5 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''} text-slate-400 group-hover:text-blue-400`} />
+                <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''} text-slate-400 group-hover:text-blue-400`} />
             </button>
 
             {isOpen && (
-                <div className="absolute top-full right-0 mt-3 w-96 bg-slate-800 border border-blue-500/30 rounded-3xl shadow-2xl z-50 overflow-hidden">
+                <div className="absolute top-full right-0 mt-2 w-80 bg-slate-800 border border-blue-500/30 rounded-2xl shadow-2xl z-50 overflow-hidden">
                     {/* Header */}
-                    <div className="p-6 border-b border-blue-500/20 bg-gradient-to-r from-blue-500/10 to-cyan-500/10">
-                        <div className="flex items-center gap-3">
-                            <Zap className="h-6 w-6 text-blue-400 animate-pulse" />
-                            <span className="text-white font-bold text-lg">AI Models</span>
+                    <div className="p-3 border-b border-blue-500/20 bg-gradient-to-r from-blue-500/10 to-cyan-500/10">
+                        <div className="flex items-center gap-2">
+                            <Zap className="h-4 w-4 text-blue-400" />
+                            <span className="text-white font-bold text-sm">AI Models</span>
                         </div>
-                        <p className="text-sm text-slate-400 mt-2 font-medium">Choose your AI assistant</p>
+                        <p className="text-xs text-slate-400 mt-1 font-medium">Choose your AI assistant</p>
                     </div>
 
                     {/* Model List */}
-                    <div className="p-3 max-h-80 overflow-y-auto custom-scrollbar">
+                    <div className="p-2 max-h-64 overflow-y-auto custom-scrollbar">
                         {Object.entries(AVAILABLE_MODELS).map(([key, model]) => (
                             <button
                                 key={key}
                                 onClick={() => handleModelSelect(model.key)}
-                                className={`w-full text-left p-4 rounded-2xl text-sm transition-all duration-300 group mb-2 ${
+                                className={`w-full text-left p-3 rounded-xl text-xs transition-all duration-300 group mb-1 ${
                                     selectedModel === model.key
-                                        ? 'bg-gradient-to-r from-blue-500/20 to-cyan-500/20 text-blue-400 border border-blue-500/30 shadow-lg animate-pulse-glow'
+                                        ? 'bg-gradient-to-r from-blue-500/20 to-cyan-500/20 text-blue-400 border border-blue-500/30 shadow-lg'
                                         : 'text-slate-300 hover:bg-slate-700 hover:text-white'
                                 }`}
                             >
                                 <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-4">
-                                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                                    <div className="flex items-center gap-3">
+                                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
                                             selectedModel === model.key
-                                                ? 'bg-gradient-to-r from-blue-500 to-cyan-500 animate-pulse-glow'
+                                                ? 'bg-gradient-to-r from-blue-500 to-cyan-500'
                                                 : 'bg-slate-700 group-hover:bg-slate-600'
                                         }`}>
-                                            <Bot className="h-6 w-6 text-white" />
+                                            <Bot className="h-4 w-4 text-white" />
                                         </div>
                                         <div>
-                                            <div className="font-bold text-lg">{model.name}</div>
+                                            <div className="font-bold text-sm">{model.name}</div>
                                             <div className="text-xs text-slate-400 font-medium">{model.provider}</div>
                                         </div>
                                     </div>
                                     
-                                    <div className="flex items-center gap-3">
+                                    <div className="flex items-center gap-2">
                                         {model.provider === 'OpenRouter' && (
-                                            <span className="text-xs bg-emerald-500/20 text-emerald-400 px-3 py-1 rounded-full border border-emerald-500/30 font-bold">
+                                            <span className="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/30 font-bold">
                                                 Free
                                             </span>
                                         )}
                                         {selectedModel === model.key && (
-                                            <div className="w-3 h-3 bg-blue-400 rounded-full animate-pulse"></div>
+                                            <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
                                         )}
                                     </div>
                                 </div>
 
                                 {/* Model Features */}
-                                <div className="mt-4 flex flex-wrap gap-2">
+                                <div className="mt-2 flex flex-wrap gap-1">
                                     {model.provider === 'Google' && (
-                                        <span className="text-xs bg-blue-500/10 text-blue-400 px-2 py-1 rounded font-medium">Fast</span>
+                                        <span className="text-xs bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded font-medium">Fast</span>
                                     )}
                                     {model.provider === 'OpenRouter' && (
                                         <>
-                                            <span className="text-xs bg-purple-500/10 text-purple-400 px-2 py-1 rounded font-medium">Advanced</span>
-                                            <span className="text-xs bg-green-500/10 text-green-400 px-2 py-1 rounded font-medium">Free Tier</span>
+                                            <span className="text-xs bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded font-medium">Advanced</span>
+                                            <span className="text-xs bg-green-500/10 text-green-400 px-2 py-0.5 rounded font-medium">Free Tier</span>
                                         </>
                                     )}
                                 </div>
@@ -108,9 +108,9 @@ function ModelSelector() {
                     </div>
 
                     {/* Footer */}
-                    <div className="p-6 border-t border-blue-500/20 bg-slate-800">
+                    <div className="p-3 border-t border-blue-500/20 bg-slate-800">
                         <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
-                            <Star className="h-4 w-4 animate-pulse" />
+                            <Star className="h-3 w-3" />
                             <span>All models support code generation</span>
                         </div>
                     </div>
