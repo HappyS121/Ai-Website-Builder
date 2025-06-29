@@ -46,7 +46,7 @@ const OPENROUTER_MODELS = {
     QWEN: "qwen/qwen3-235b-a22b:free"
 };
 
-// OpenRouter API call function
+// OpenRouter API call function with timeout handling
 const callOpenRouter = async (model, messages, config = {}) => {
     if (!openRouterApiKey) {
         throw new Error("OpenRouter API key not configured");
@@ -66,24 +66,44 @@ const callOpenRouter = async (model, messages, config = {}) => {
         requestBody.response_format = config.responseFormat;
     }
 
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-            "Authorization": `Bearer ${openRouterApiKey}`,
-            "Content-Type": "application/json",
-            "HTTP-Referer": process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
-            "X-Title": "AI Website Builder"
-        },
-        body: JSON.stringify(requestBody)
-    });
+    // Create AbortController for timeout handling
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => {
+        controller.abort();
+    }, 60000); // 60 seconds timeout
 
-    if (!response.ok) {
-        const error = await response.text();
-        throw new Error(`OpenRouter API error: ${error}`);
+    try {
+        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${openRouterApiKey}`,
+                "Content-Type": "application/json",
+                "HTTP-Referer": process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
+                "X-Title": "AI Website Builder"
+            },
+            body: JSON.stringify(requestBody),
+            signal: controller.signal
+        });
+
+        // Clear timeout on successful response
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+            const error = await response.text();
+            throw new Error(`OpenRouter API error: ${error}`);
+        }
+
+        const data = await response.json();
+        return data.choices[0].message.content;
+    } catch (error) {
+        // Clear timeout in case of error
+        clearTimeout(timeoutId);
+        
+        if (error.name === 'AbortError') {
+            throw new Error('Request timeout: The AI model took too long to respond. Please try again.');
+        }
+        throw error;
     }
-
-    const data = await response.json();
-    return data.choices[0].message.content;
 };
 
 // OpenRouter Chat Sessions
