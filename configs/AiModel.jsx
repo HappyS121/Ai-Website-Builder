@@ -70,7 +70,7 @@ const callOpenRouter = async (model, messages, config = {}) => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => {
         controller.abort();
-    }, 60000); // 60 seconds timeout
+    }, 120000); // Increased timeout to 120 seconds (2 minutes)
 
     try {
         const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {

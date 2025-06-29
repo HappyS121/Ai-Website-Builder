@@ -106,10 +106,13 @@ function CodeView() {
             const mergedFiles = {...defaultFiles, ...processedAiFiles};
             setFiles(mergedFiles);
 
-            await UpdateFiles({
-                workspaceId:id,
-                files:result.data?.files
-            });
+            // Only call UpdateFiles if we have files to update
+            if (result.data?.files && Object.keys(result.data.files).length > 0) {
+                await UpdateFiles({
+                    workspaceId:id,
+                    files:result.data?.files
+                });
+            }
         } catch (error) {
             console.error('Error generating code:', error);
         }
