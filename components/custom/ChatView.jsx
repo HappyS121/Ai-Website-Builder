@@ -18,7 +18,6 @@ function ChatView() {
     const { selectedModel } = useModel();
     const [userInput, setUserInput] = useState();
     const [loading, setLoading] = useState(false);
-    const [environment, setEnvironment] = useState('react');
     const UpdateMessages = useMutation(api.workspace.UpdateWorkspace);
 
     useEffect(() => {
@@ -30,7 +29,6 @@ function ChatView() {
             workspaceId: id
         });
         setMessages(result?.messages);
-        setEnvironment(result?.environment || 'react');
         console.log(result);
     }
 
@@ -50,8 +48,7 @@ function ChatView() {
         try {
             const result = await axios.post('/api/ai-chat', {
                 prompt: PROMPT,
-                model: selectedModel,
-                environment: environment
+                model: selectedModel
             });
 
             const aiResp = {
@@ -84,16 +81,6 @@ function ChatView() {
 
     return (
         <div className="relative h-[85vh] flex flex-col bg-gray-900">
-            {/* Environment indicator */}
-            <div className="bg-gray-800/50 border-b border-gray-700 px-4 py-2">
-                <div className="flex items-center gap-2">
-                    <span className="text-xs text-gray-400">Environment:</span>
-                    <span className="text-xs font-medium text-blue-400">
-                        {environment === 'html' ? 'HTML/CSS/JS' : 'React + Vite'}
-                    </span>
-                </div>
-            </div>
-
             {/* Chat Messages */}
             <div className="flex-1 overflow-y-auto scrollbar-hide p-4">
                 <div className="max-w-4xl mx-auto space-y-4">
